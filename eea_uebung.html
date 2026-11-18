@@ -41,6 +41,12 @@
 
     --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow-sm: 0 1px 2px rgba(35, 33, 29, 0.045), 0 1px 8px rgba(35, 33, 29, 0.03);
+
+    --new-soft: #e6f0ea;
+    --new-soft-hover: #d8e8de;
+    --new-line: #c6dccf;
+    --new-line-hover: #b3cfbc;
+    --new-ink: #2a5e46;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -69,6 +75,12 @@
       --warn-soft: #2b2418;
 
       --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+
+      --new-soft: #1d2b24;
+      --new-soft-hover: #25362d;
+      --new-line: #34483c;
+      --new-line-hover: #425a4a;
+      --new-ink: #8fc7a8;
     }
   }
 
@@ -475,12 +487,18 @@
     border-color: var(--accent-strong);
   }
 
-  .btn--ghost {
-    color: var(--ink-soft);
-    background: transparent;
-    border-color: transparent;
+  .btn--new {
+    color: var(--new-ink);
+    background: var(--new-soft);
+    border-color: var(--new-line);
   }
-  .btn--ghost:hover { color: var(--ink); background: var(--surface-2); }
+  .btn--new:hover {
+    color: var(--new-ink);
+    background: var(--new-soft-hover);
+    border-color: var(--new-line-hover);
+  }
+  .btn--new:focus-visible { outline: 2px solid var(--new-ink); outline-offset: 2px; }
+
 
   .hint {
     margin: 0;
@@ -671,9 +689,7 @@
   <header class="masthead">
     <p class="eyebrow">Zahlentheorie · Übung</p>
     <h1>Erweiterter Euklid und Inverse in ℤ/nℤ</h1>
-    <p class="lede">
-      Geprüft wird jeweils nur dein Ergebnis – der Rechenweg ist dir freigestellt.
-    </p>
+
   </header>
 
   <!-- =================================================================
@@ -774,7 +790,7 @@
           <div class="actions">
             <button class="btn btn--primary" type="submit">Prüfen</button>
             <button class="btn" type="button" id="btn-eea-clear">Felder leeren</button>
-            <button class="btn btn--ghost" type="button" id="btn-eea-new">Neue Aufgabe</button>
+            <button class="btn btn--new" type="button" id="btn-eea-new">Neue Aufgabe</button>
           </div>
 
           <p class="feedback" id="feedback-eea" role="status" aria-live="polite"></p>
@@ -844,7 +860,7 @@
         <div class="actions">
           <button class="btn btn--primary" type="submit">Prüfen</button>
           <button class="btn" type="button" id="btn-inv-clear">Felder leeren</button>
-          <button class="btn btn--ghost" type="button" id="btn-inv-new">Neue Aufgabe</button>
+          <button class="btn btn--new" type="button" id="btn-inv-new">Neue Aufgabe</button>
         </div>
 
         <p class="feedback" id="feedback-inv" role="status" aria-live="polite"></p>
@@ -917,7 +933,7 @@
         <div class="actions">
           <button class="btn btn--primary" type="submit">Prüfen</button>
           <button class="btn" type="button" id="btn-eq3-clear">Felder leeren</button>
-          <button class="btn btn--ghost" type="button" id="btn-eq3-new">Neue Aufgabe</button>
+          <button class="btn btn--new" type="button" id="btn-eq3-new">Neue Aufgabe</button>
         </div>
 
         <p class="feedback" id="feedback-eq3" role="status" aria-live="polite"></p>
