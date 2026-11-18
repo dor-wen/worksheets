@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Übung: Erweiterter Euklid und Inverse in ℤ/nℤ</title>
+
+<style>
+  /* =====================================================================
+     1 · Design-Tokens
+     ===================================================================== */
+  :root {
+    color-scheme: light dark;
+
+    --bg: #f6f5f2;
+    --bg-veil: rgba(246, 245, 242, 0.86);
+    --surface: #fdfdfc;
+    --surface-2: #f0eeea;
+    --ink: #23211d;
+    --ink-soft: #5f5a52;
+    --ink-faint: #9a948a;
+    --line: #e3dfd7;
+    --line-strong: #cec8bd;
+
+    --accent: #4a5a9c;
+    --accent-strong: #3c4a84;
+    --accent-soft: #e9ecf7;
+    --accent-ring: rgba(74, 90, 156, 0.2);
+    --on-accent: #ffffff;
+
+    --good: #2f6b4c;
+    --good-soft: #e7f1ea;
+    --bad: #a4372f;
+    --bad-soft: #f9eae8;
+    --warn: #8a6417;
+    --warn-soft: #faf0dc;
+
+    --radius-lg: 14px;
+    --radius: 10px;
+    --radius-sm: 8px;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --shadow-sm: 0 1px 2px rgba(35, 33, 29, 0.045), 0 1px 8px rgba(35, 33, 29, 0.03);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131418;
+      --bg-veil: rgba(19, 20, 24, 0.88);
+      --surface: #1b1d22;
+      --surface-2: #23252b;
+      --ink: #e8e6e1;
+      --ink-soft: #a5a19a;
+      --ink-faint: #6d6a64;
+      --line: #2d2f36;
+      --line-strong: #3d4048;
+
+      --accent: #94a3e8;
+      --accent-strong: #a9b6ee;
+      --accent-soft: #222741;
+      --accent-ring: rgba(148, 163, 232, 0.25);
+      --on-accent: #131418;
+
+      --good: #82c4a2;
+      --good-soft: #1b2a23;
+      --bad: #e5948e;
+      --bad-soft: #2d1f1e;
+      --warn: #dcb26a;
+      --warn-soft: #2b2418;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  /* =====================================================================
+     2 · Grundlagen
+     ===================================================================== */
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background:
+      radial-gradient(70rem 22rem at 50% -8rem, var(--accent-soft), transparent 70%),
+      var(--bg);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 4rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .var { font-style: italic; }
+
+  /* =====================================================================
+     3 · Kopfbereich
+     ===================================================================== */
+  .masthead { padding-top: 0.75rem; }
+
+  .eyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .masthead h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3.4vw, 2.05rem);
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin: 0.6rem 0 0;
+    font-size: 0.97rem;
+    color: var(--ink-soft);
+  }
+
+  /* =====================================================================
+     4 · Stepper (Progress-Layout)
+     ===================================================================== */
+  .stepper {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 20;
+    margin-top: 1.4rem;
+    padding: 0.7rem 0.85rem 0.6rem;
+    background: var(--bg-veil);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(10px);
+  }
+
+  .stepper-track {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .step {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 0.35rem 0.3rem;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .step:hover { color: var(--ink-soft); background: var(--surface-2); }
+  .step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .step-dot {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+  }
+
+  .step-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .step .step-check { display: none; }
+
+  .step.is-done { color: var(--ink-soft); }
+  .step.is-done .step-dot {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .step.is-done .step-num { display: none; }
+  .step.is-done .step-check { display: inline; }
+
+  .step.is-active { color: var(--ink); }
+  .step.is-active .step-dot {
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  .progress {
+    height: 3px;
+    margin-top: 0.6rem;
+    overflow: hidden;
+    background: var(--line);
+    border-radius: 999px;
+  }
+
+  .progress-fill {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+    border-radius: inherit;
+    transition: width 0.4s ease;
+  }
+
+  /* =====================================================================
+     5 · Karten und Abschnitte
+     ===================================================================== */
+  .card {
+    margin-top: 1.25rem;
+    padding: 1.5rem 1.5rem 1.6rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    scroll-margin-top: 6.5rem;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .badge {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.78rem;
+    font-weight: 650;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 50%;
+  }
+
+  .card h2 {
+    margin: 0;
+    font-size: 1.12rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .card-sub {
+    max-width: 75ch;
+    margin: 0.5rem 0 1.25rem;
+    font-size: 1rem;
+    color: var(--ink-soft);
+  }
+
+  .card-sub > ul > li {
+    color: var(--ink-soft);
+
+  }
+
+
+  /* --- Aufgabenstellung: gegebene Zahlen ----------------------------- */
+  .numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .number-box {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .number-label { color: var(--ink-soft); }
+
+  .number-value {
+    font-size: 1.25rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  /* --- Antwortbereich ----------------------------------------------- */
+  .answer { display: grid; gap: 0.85rem; }
+
+  .answer-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .eqm { display: inline-flex; align-items: center; }
+  .eqm math { font-size: 1.1em; }
+
+
+  /* --- Eingabefelder ------------------------------------------------- */
+  .field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .input {
+    width: 5.2rem;
+    padding: 0.5rem 0.6rem;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+
+  .input--coef { width: 4.4rem; }
+
+  .input::placeholder { color: var(--ink-faint); }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  .input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .mark {
+    width: 1.05rem;
+    font-weight: 700;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .field.is-good .mark { opacity: 1; color: var(--good); }
+  .field.is-bad .mark { opacity: 1; color: var(--bad); }
+  .field.is-warn .mark { opacity: 1; color: var(--warn); }
+
+  .field.is-good .input { background: var(--good-soft); border-color: var(--good); }
+  .field.is-bad .input { background: var(--bad-soft); border-color: var(--bad); }
+  .field.is-warn .input { background: var(--warn-soft); border-color: var(--warn); }
+
+
+  /* --- Eingabefelder innerhalb einer Formel (Aufgabe 1) ------------- */
+  .equation-row {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.22em;
+    max-width: 100%;
+  }
+
+  .equation-row math { font-size: 1.1em; }
+
+  .field--inline {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .input--inline {
+    width: 3.4rem;
+    padding: 0.3rem 0.35rem;
+    font-size: 0.92rem;
+  }
+
+  /* Prüfmarke als kleine Ecke – verschiebt den Zeilenfluss nicht. */
+  .field--inline .mark {
+    position: absolute;
+    top: -0.45em;
+    right: -0.4em;
+    width: auto;
+    font-size: 0.72em;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* --- Auswahl (Inverse) -------------------------------------------- */
+  .choices {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.94rem;
+    cursor: pointer;
+  }
+
+  .choice input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* --- Aktionen und Rückmeldung ------------------------------------- */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+  }
+
+  .btn {
+    padding: 0.55rem 1.05rem;
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.06s ease;
+  }
+
+  .btn:hover { background: var(--surface-2); border-color: var(--ink-faint); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .btn--primary {
+    color: var(--on-accent);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .btn--primary:hover {
+    color: var(--on-accent);
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
+  }
+
+  .btn--ghost {
+    color: var(--ink-soft);
+    background: transparent;
+    border-color: transparent;
+  }
+  .btn--ghost:hover { color: var(--ink); background: var(--surface-2); }
+
+  .hint {
+    margin: 0;
+    font-size: 0.83rem;
+    color: var(--ink-faint);
+  }
+
+  .feedback {
+    min-height: 1.5em;
+    margin: 0;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .feedback.is-good { color: var(--good); }
+  .feedback.is-bad { color: var(--bad); }
+  .feedback.is-warn { color: var(--warn); }
+  .feedback math { font-size: 1.05em; }
+
+  /* --- Beispiel-Aufklappfeld ---------------------------------------- */
+  .example {
+    margin-top: 1.6rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .example summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .example summary::-webkit-details-marker { display: none; }
+
+  .example summary::before {
+    content: "+";
+    display: inline-grid;
+    place-items: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    font-size: 0.8rem;
+    line-height: 1;
+    color: var(--ink-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+  }
+
+  .example[open] summary::before { content: "−"; }
+  .example summary:hover { color: var(--ink); }
+
+  .example-body {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.85rem 0 0.1rem;
+  }
+
+  .example-line {
+    margin: 0;
+    overflow-x: auto;
+    font-size: 0.93rem;
+    color: var(--ink-soft);
+  }
+
+  .example-line math { font-size: 1.05em; color: var(--ink); }
+
+  /* --- Auswertung ---------------------------------------------------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .stat {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.85rem 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .stat-label {
+    font-size: 0.71rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .stat-value {
+    font-size: 1.45rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* --- Fuß ----------------------------------------------------------- */
+  .colophon {
+    margin-top: 2.5rem;
+    padding-top: 1.1rem;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    border-top: 1px solid var(--line);
+  }
+
+  .colophon p { margin: 0; }
+
+
+  /* =====================================================================
+     5b · Gleichungsaufgaben und Abschnittsstatistik
+     ===================================================================== */
+  .equation-panel {
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+    padding: 1.3rem 1rem 1.15rem;
+    text-align: center;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .equation-panel-label {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--ink-soft);
+  }
+
+  .equation-panel-label math { font-size: 1.05em; }
+
+  .equation-display math { font-size: clamp(1.35rem, 4.6vw, 1.65rem); }
+
+  .breakdown {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0.5rem 0 1.1rem;
+    padding: 0.85rem 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.89rem;
+  }
+
+  .breakdown-row dt { color: var(--ink-soft); }
+
+  .breakdown-row dd {
+    margin: 0;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+
+  /* =====================================================================
+     6 · Responsiv und Bewegungspräferenz
+     ===================================================================== */
+  @media (max-width: 560px) {
+    .page { padding: 1.25rem 0.9rem 3rem; }
+    .card { padding: 1.15rem; }
+    .step { justify-content: center; }
+    .step-label { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+
+<body>
+<div class="page">
+
+  <!-- =================================================================
+       Kopfbereich
+       ================================================================= -->
+  <header class="masthead">
+    <p class="eyebrow">Zahlentheorie · Übung</p>
+    <h1>Erweiterter Euklid und Inverse in ℤ/nℤ</h1>
+    <p class="lede">
+      Geprüft wird jeweils nur dein Ergebnis – der Rechenweg ist dir freigestellt.
+    </p>
+  </header>
+
+  <!-- =================================================================
+       Fortschrittsleiste
+       ================================================================= -->
+  <nav class="stepper" id="stepper" aria-label="Abschnitte">
+      <div class="stepper-track">
+        <button class="step is-active" type="button" data-target="step-1"
+                aria-label="Abschnitt 1: Erweiterter euklidischer Algorithmus">
+          <span class="step-dot">
+            <span class="step-num">1</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </span>
+          <span class="step-label">Erweiterter Euklid</span>
+        </button>
+
+        <button class="step" type="button" data-target="step-2"
+                aria-label="Abschnitt 2: Inverse in Z modulo n">
+          <span class="step-dot">
+            <span class="step-num">2</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </span>
+          <span class="step-label">Inverse</span>
+        </button>
+
+        <button class="step" type="button" data-target="step-3"
+                aria-label="Abschnitt 3: Lineare Gleichungen in Z modulo n">
+          <span class="step-dot">
+            <span class="step-num">3</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </span>
+          <span class="step-label">Gleichungen</span>
+        </button>
+
+        <button class="step" type="button" data-target="step-4"
+                aria-label="Abschnitt 4: Auswertung">
+          <span class="step-dot">
+            <span class="step-num">4</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </span>
+          <span class="step-label">Auswertung</span>
+        </button>
+      </div>
+
+
+
+    <div class="progress" id="progress-bar" role="progressbar"
+         aria-label="Anteil richtig gelöster Aufgaben"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ===============================================================
+         Abschnitt 1: Erweiterter euklidischer Algorithmus
+         =============================================================== -->
+    <section class="card" id="step-1" aria-labelledby="step-1-title">
+      <header class="card-head">
+        <span class="badge" aria-hidden="true">1</span>
+        <h2 id="step-1-title">Erweiterter euklidischer Algorithmus</h2>
+      </header>
+
+      <p class="card-sub">
+        Bestimme den ggT der beiden Zahlen <span class="var">a</span> und <span class="var">b</span>.<br/> Bestimme außerdem ganze Zahlen
+        <span class="var">r</span> und <span class="var">s</span> mit
+        <span class="var">r</span>·<span class="var">a</span> +
+        <span class="var">s</span>·<span class="var">b</span> =
+        ggT(<span class="var">a</span>, <span class="var">b</span>).
+        Wie du dorthin kommst, ist dir überlassen.
+      </p>
+
+      <div class="numbers">
+        <div class="number-box">
+          <span class="number-label" id="label-eea-a" aria-hidden="true"></span>
+          <span class="number-value" id="value-eea-a">–</span>
+        </div>
+        <div class="number-box">
+          <span class="number-label" id="label-eea-b" aria-hidden="true"></span>
+          <span class="number-value" id="value-eea-b">–</span>
+        </div>
+      </div>
+
+      <form class="answer" id="form-eea" autocomplete="off" novalidate>
+          <div class="answer-line">
+            <span class="eqm" id="math-eea-gcd"></span>
+          </div>
+
+          <div class="answer-line">
+            <span class="eqm" id="math-eea-bezout"></span>
+          </div>
+
+          <p class="hint">
+            Jedes Paar (r, s), das die Gleichung erfüllt, gilt als richtig.
+          </p>
+
+          <div class="actions">
+            <button class="btn btn--primary" type="submit">Prüfen</button>
+            <button class="btn" type="button" id="btn-eea-clear">Felder leeren</button>
+            <button class="btn btn--ghost" type="button" id="btn-eea-new">Neue Aufgabe</button>
+          </div>
+
+          <p class="feedback" id="feedback-eea" role="status" aria-live="polite"></p>
+
+      </form>
+
+      <details class="example">
+        <summary>Beispiel anzeigen</summary>
+        <div class="example-body" id="example-eea"></div>
+      </details>
+    </section>
+
+    <!-- ===============================================================
+         Abschnitt 2: Inverse im Restklassenring
+         =============================================================== -->
+    <section class="card" id="step-2" aria-labelledby="step-2-title">
+      <header class="card-head">
+        <span class="badge" aria-hidden="true">2</span>
+        <h2 id="step-2-title">Inverse im Restklassenring</h2>
+      </header>
+
+      <p class="card-sub">
+        Gesucht ist das multiplikative Inverse von <span class="var">a</span> modulo
+        <span class="var">n</span>, sofern es existiert.
+      </p>
+
+      <div class="numbers">
+        <div class="number-box">
+          <span class="number-label" id="label-inv-a" aria-hidden="true"></span>
+          <span class="number-value" id="value-inv-a">–</span>
+        </div>
+        <div class="number-box">
+          <span class="number-label" id="label-inv-n" aria-hidden="true"></span>
+          <span class="number-value" id="value-inv-n">–</span>
+        </div>
+      </div>
+
+      <div class="answer-line">
+        <span class="eqm" id="math-inv-prompt"></span>
+      </div>
+
+      <form class="answer" id="form-inv" autocomplete="off" novalidate>
+        <fieldset class="choices">
+          <legend class="sr-only">Existiert ein Inverses?</legend>
+
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="inv-exists" value="yes" checked>
+              <span>Es gibt ein Inverses, nämlich</span>
+            </label>
+            <span class="field">
+              <input class="input input--coef" id="input-inv-x" type="text"
+                     inputmode="numeric" autocomplete="off" placeholder="x"
+                     aria-label="Inverses x">
+              <span class="mark" aria-hidden="true"></span>
+            </span>
+          </div>
+
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="inv-exists" value="no">
+              <span>Es gibt kein Inverses.</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button class="btn btn--primary" type="submit">Prüfen</button>
+          <button class="btn" type="button" id="btn-inv-clear">Felder leeren</button>
+          <button class="btn btn--ghost" type="button" id="btn-inv-new">Neue Aufgabe</button>
+        </div>
+
+        <p class="feedback" id="feedback-inv" role="status" aria-live="polite"></p>
+      </form>
+
+      <details class="example">
+        <summary>Beispiel anzeigen</summary>
+        <div class="example-body" id="example-inv"></div>
+      </details>
+    </section>
+
+    <!-- ===============================================================
+         Abschnitt 3: Lineare Gleichungen in ℤ/nℤ
+         =============================================================== -->
+    <section class="card" id="step-3" aria-labelledby="step-3-title">
+      <header class="card-head">
+        <span class="badge" aria-hidden="true">3</span>
+        <h2 id="step-3-title">Lineare Gleichungen in ℤ/nℤ</h2>
+      </header>
+
+      <div class="card-sub">
+        Löse die Gleichung im Restklassenring. Gesucht ist ein Repräsentant aus
+        {0, …, <span class="var">n</span>−1}.
+
+        Beachte:
+        <ul>
+            <li>
+                Wenn der Koeffizient vor dem <span class="var">x</span> ein multiplikatives Inverses in ℤ/nℤ hat, gibt es immer genau eine Lösung.
+            </li>
+            <li>
+                Wenn der Koeffizient kein multiplikatives Inverses in ℤ/nℤ hat, kann es passieren, dass es keine Lösung gibt. In diesem Fall kann es aber auch eine oder mehrere Lösungen geben. Die Aufgaben werden so generiert, dass dies nur für kleine Werte von <span class="var">n</span> der Fall. Ob es eine Lösung gibt, kann man dann einfach durch Probieren herausfinden.
+            </li>
+        </ul>
+
+        </div>
+
+      <div class="equation-panel">
+        <p class="equation-panel-label" id="eq3-prompt-line"></p>
+        <div class="equation-display" id="eq3-equation"></div>
+      </div>
+
+      <form class="answer" id="form-eq3" autocomplete="off" novalidate>
+        <fieldset class="choices">
+          <legend class="sr-only">Lösung angeben oder Lösbarkeit verneinen</legend>
+
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="eq3-solution" value="yes" checked>
+              <span>Die Lösung lautet</span>
+            </label>
+            <span class="eqm" id="math-eq3-answer" aria-hidden="true"></span>
+            <span class="field">
+              <input class="input input--coef" id="input-eq3-x" type="text"
+                     inputmode="numeric" autocomplete="off" placeholder="x"
+                     aria-label="Repräsentant der Lösung">
+              <span class="mark" aria-hidden="true"></span>
+            </span>
+          </div>
+
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="eq3-solution" value="no">
+              <span>Es gibt keine Lösung.</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <p class="hint" id="eq3-hint"></p>
+
+        <div class="actions">
+          <button class="btn btn--primary" type="submit">Prüfen</button>
+          <button class="btn" type="button" id="btn-eq3-clear">Felder leeren</button>
+          <button class="btn btn--ghost" type="button" id="btn-eq3-new">Neue Aufgabe</button>
+        </div>
+
+        <p class="feedback" id="feedback-eq3" role="status" aria-live="polite"></p>
+      </form>
+
+      <details class="example">
+        <summary>Beispiel anzeigen</summary>
+        <div class="example-body" id="example-eq3"></div>
+      </details>
+    </section>
+
+
+    <!-- ===============================================================
+         Abschnitt 4: Auswertung
+         =============================================================== -->
+    <section class="card" id="step-4" aria-labelledby="step-4-title">
+      <header class="card-head">
+        <span class="badge" aria-hidden="true">4</span>
+        <h2 id="step-4-title">Auswertung</h2>
+      </header>
+
+      <p class="card-sub">
+        Dein Fortschritt wird lokal in diesem Browser gespeichert. Du kannst jederzeit
+        zurückgehen und neue Zahlen ziehen.
+      </p>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Aufgaben geprüft</span>
+          <span class="stat-value" id="stat-tasks">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Davon richtig</span>
+          <span class="stat-value" id="stat-solved">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Trefferquote</span>
+          <span class="stat-value" id="stat-rate">–</span>
+        </div>
+      </div>
+
+      <p class="hint">Richtig / geprüft je Abschnitt</p>
+      <dl class="breakdown">
+        <div class="breakdown-row">
+          <dt>Erweiterter Euklid</dt>
+          <dd id="breakdown-gcd">0 / 0</dd>
+        </div>
+        <div class="breakdown-row">
+          <dt>Inverse in ℤ/nℤ</dt>
+          <dd id="breakdown-inverse">0 / 0</dd>
+        </div>
+        <div class="breakdown-row">
+          <dt>Lineare Gleichungen</dt>
+          <dd id="breakdown-equation">0 / 0</dd>
+        </div>
+      </dl>
+
+      <p class="feedback" id="stat-note" role="status" aria-live="polite"></p>
+
+      <div class="actions">
+        <button class="btn" type="button" id="btn-reset-progress">Fortschritt zurücksetzen</button>
+      </div>
+    </section>
+
+
+  </main>
+
+  <footer class="colophon">
+    <p>Übungsseite für den Vertiefungskurs Mathematik</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================================
+     1 · Zahlentheorie
+     ===================================================================== */
+
+  /** Größter gemeinsamer Teiler (euklidischer Algorithmus). */
+  function gcd(a, b) {
+    while (b !== 0) {
+      [a, b] = [b, a % b];
+    }
+    return a;
+  }
+
+  /**
+   * Erweiterter euklidischer Algorithmus.
+   * Liefert { gcd, r, s } mit r·a + s·b = gcd.
+   */
+  function extendedGcd(a, b) {
+    let r0 = a;
+    let r1 = b;
+    let s0 = 1;
+    let s1 = 0;
+    let t0 = 0;
+    let t1 = 1;
+
+    while (r1 !== 0) {
+      const q = Math.floor(r0 / r1);
+      [r0, r1] = [r1, r0 - q * r1];
+      [s0, s1] = [s1, s0 - q * s1];
+      [t0, t1] = [t1, t0 - q * t1];
+    }
+
+    return { gcd: r0, r: s0, s: t0 };
+  }
+
+  /** Repräsentant von value modulo n im Bereich 0 … n-1 (auch für negative Werte). */
+  function mod(value, n) {
+    return ((value % n) + n) % n;
+  }
+
+  /** Anzahl der Divisionsschritte des euklidischen Algorithmus. */
+  function divisionSteps(a, b) {
+    let steps = 0;
+    while (b !== 0) {
+      [a, b] = [b, a % b];
+      steps += 1;
+    }
+    return steps;
+  }
+
+  const randInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+  const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
+
+  /* =====================================================================
+     2 · Aufgabengenerierung
+     ===================================================================== */
+
+  /** Aufgabe 1: zwei natürliche Zahlen mit mindestens drei Divisionsschritten. */
+  function createGcdTask() {
+    for (let attempt = 0; attempt < 500; attempt += 1) {
+      const a = randInt(25, 99);
+      const b = randInt(10, Math.min(a - 1, 60));
+      if (b < 10 || divisionSteps(a, b) < 3) continue;
+      return { a, b, ...extendedGcd(a, b) };
+    }
+    // Rückfallebene – praktisch unerreichbar.
+    return { a: 99, b: 37, ...extendedGcd(99, 37) };
+  }
+
+  const PRIME_MODULI = [7, 11, 13, 17, 19, 23, 29, 31];
+  const COMPOSITE_MODULI = [
+    8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22,
+    24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36
+  ];
+  const NO_INVERSE_SHARE = 0.4;
+
+  /** Aufgabe 2: Inverses von a modulo n – oder der Nachweis, dass keines existiert. */
+  function createInverseTask() {
+    const askForImpossible = Math.random() < NO_INVERSE_SHARE;
+    const moduli = askForImpossible
+      ? COMPOSITE_MODULI
+      : PRIME_MODULI.concat(COMPOSITE_MODULI);
+
+    for (let attempt = 0; attempt < 200; attempt += 1) {
+      const n = pickRandom(moduli);
+      const candidates = [];
+
+      for (let a = 2; a <= n - 2; a += 1) {
+        const coprime = gcd(a, n) === 1;
+        if (coprime !== askForImpossible) candidates.push(a);
+      }
+
+      if (candidates.length === 0) continue;
+
+      const a = pickRandom(candidates);
+      const invertible = gcd(a, n) === 1;
+
+      return {
+        n,
+        a,
+        invertible,
+        inverse: invertible ? mod(extendedGcd(n, a).s, n) : null
+      };
+    }
+
+    return { n: 7, a: 3, invertible: true, inverse: 5 };
+  }
+
+
+  /* ---------------------------------------------------------------------
+     Aufgabe 3: lineare Gleichungen a·x + b ≡ c in ℤ/nℤ
+     --------------------------------------------------------------------- */
+
+  const EQUATION_MODULI = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 21, 24, 25, 27, 30];
+  const SMALL_MODULI = [4, 6, 8, 9];     // hier ist Durchprobieren zumutbar
+  const UNSOLVABLE_SHARE = 0.2;          // Anteil unlösbarer Aufgaben
+  const NON_COPRIME_SHARE = 0.35;        // Anteil mit mehreren Lösungen
+
+  /** Lösbar genau dann, wenn der ggT die Differenz c − b teilt. */
+  function isSolvable(a, b, c, n) {
+    return mod(c - b, n) % gcd(a, n) === 0;
+  }
+
+  /** Alle Lösungen im Bereich 0 … n−1. */
+  function allSolutions(a, b, c, n) {
+    const list = [];
+    for (let x = 0; x < n; x += 1) {
+      if (mod(a * x + b - c, n) === 0) list.push(x);
+    }
+    return list;
+  }
+
+  /** Werte von a·x + b in ℤ/nℤ (für kleine n anschaulich). */
+  function imageValues(a, b, n) {
+    const values = new Set();
+    for (let x = 0; x < n; x += 1) values.add(mod(a * x + b, n));
+    return Array.from(values).sort((left, right) => left - right);
+  }
+
+  function createEquationTask() {
+    return Math.random() < UNSOLVABLE_SHARE
+      ? createUnsolvableEquation()
+      : createSolvableEquation();
+  }
+
+  /** Lösbare Aufgabe: x₀ wählen und c daraus berechnen. */
+  function createSolvableEquation() {
+    const wantMultiple = Math.random() < NON_COPRIME_SHARE;
+
+    for (let attempt = 0; attempt < 400; attempt += 1) {
+      const n = pickRandom(EQUATION_MODULI);
+      const a = randInt(2, n - 1);
+      if ((gcd(a, n) > 1) !== wantMultiple) continue;
+
+      const b = randInt(1, n - 1);
+      const x0 = randInt(1, n - 1);
+
+      // Verhindert Gleichungen, bei denen das konstante Glied wegfällt.
+      if (mod(a * x0, n) === 0) continue;
+
+      const c = mod(a * x0 + b, n);
+      return { n, a, b, c, solvable: true, solutions: allSolutions(a, b, c, n) };
+    }
+
+    return { n: 11, a: 5, b: 2, c: 8, solvable: true, solutions: [10] };
+  }
+
+  /** Unlösbare Aufgabe – nur bei kleinem Modul, damit Durchprobieren greift. */
+  function createUnsolvableEquation() {
+    for (let attempt = 0; attempt < 300; attempt += 1) {
+      const n = pickRandom(SMALL_MODULI);
+      const a = randInt(2, n - 1);
+      const d = gcd(a, n);
+      if (d === 1) continue;                    // sonst immer lösbar
+
+      const b = randInt(1, n - 1);
+      const candidates = [];
+      for (let c = 0; c < n; c += 1) {
+        if (mod(c - b, n) % d !== 0) candidates.push(c);
+      }
+      if (candidates.length === 0) continue;
+
+      const c = pickRandom(candidates);
+      if (!isSolvable(a, b, c, n)) {
+        return { n, a, b, c, solvable: false, solutions: [] };
+      }
+    }
+
+    return { n: 6, a: 2, b: 1, c: 4, solvable: false, solutions: [] };
+  }
+
+  /* =====================================================================
+     3 · MathML-Bausteine
+     ===================================================================== */
+
+  const MATHML_NS = 'http://www.w3.org/1998/Math/MathML';
+
+  /** Baut ein MathML-Element mit Kindern (Knoten oder Text). */
+  function mml(tag, children = [], attributes = {}) {
+    const element = document.createElementNS(MATHML_NS, tag);
+    Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+    children.forEach((child) => element.append(child && child.nodeType ? child : String(child)));
+    return element;
+  }
+
+  const mo = (operator) => mml('mo', [operator]);
+  const mi = (name) => mml('mi', [name]);
+  const mtext = (text) => mml('mtext', [text]);
+  const mrow = (...children) => mml('mrow', children);
+  const mspace = (width) => mml('mspace', [], { width });
+
+  /** Zahl mit typografischem Minuszeichen. */
+  const mn = (value) => (Number(value) < 0
+    ? mml('mrow', [mo('−'), mml('mn', [Math.abs(value)])])
+    : mml('mn', [value]));
+
+  /** Zahl mit typografischem Minuszeichen. */
+  const mnWithParentheses = (value) => (Number(value) < 0
+    ? mml('mrow', [mo('('), mo('−'), mml('mn', [Math.abs(value)]), mo(')')])
+    : mml('mn', [value]));
+
+  const mathNode = (...children) => mml('math', [mrow(...children)]);
+
+  /* --- Platzhalter für Eingabefelder in Formeln ---------------------- */
+
+  /**
+   * Beschreibt ein Eingabefeld an einer Stelle der Formel.
+   * renderMath setzt es als echtes <input> zwischen die MathML-Segmente.
+   */
+  function fieldSlot({ id, label, placeholder, width }) {
+    return { slot: 'field', id, label, placeholder, width };
+  }
+
+  const isFieldSlot = (child) => Boolean(child && child.slot === 'field');
+
+  /** Baut das HTML-Feld, das den Platzhalter ersetzt. */
+  function createSlotElement(slot) {
+    const field = document.createElement('span');
+    field.className = 'field field--inline';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.autocomplete = 'off';
+    input.id = slot.id;
+    input.className = 'input input--inline';
+    input.placeholder = slot.placeholder || '';
+    input.setAttribute('aria-label', slot.label);
+    if (slot.width) input.style.width = slot.width;
+
+    const mark = document.createElement('span');
+    mark.className = 'mark';
+    mark.setAttribute('aria-hidden', 'true');
+
+    field.append(input, mark);
+    return field;
+  }
+
+  /**
+   * Ersetzt den Inhalt eines Elements durch eine Formel.
+   * Ohne Platzhalter entsteht ein einzelner <math>-Knoten wie bisher;
+   * mit Platzhaltern eine Flex-Zeile aus MathML-Segmenten und Eingabefeldern.
+   */
+  function renderMath(target, ...children) {
+    if (!children.some(isFieldSlot)) {
+      target.replaceChildren(mathNode(...children));
+      return;
+    }
+
+    const row = document.createElement('span');
+    row.className = 'equation-row';
+
+    let run = [];
+    const flushRun = () => {
+      if (run.length === 0) return;
+      row.append(mathNode(...run));
+      run = [];
+    };
+
+    children.forEach((child) => {
+      if (isFieldSlot(child)) {
+        flushRun();
+        row.append(createSlotElement(child));
+      } else {
+        run.push(child);
+      }
+    });
+    flushRun();
+
+    target.replaceChildren(row);
+  }
+
+
+  /** ggT(a, b) als Formel. */
+  function gcdExpr(a, b) {
+    return mrow(mi('ggT'), mo('('), mn(a), mo(','), mn(b), mo(')'));
+  }
+
+  /** „(mod n)“ als Formel. */
+  function modTag(n) {
+    return mrow(mspace('1em'), mo('('), mi('mod'), mspace('0.2em'), mn(n), mo(')'));
+  }
+
+  function modTag2(n) {
+    return mrow( mi('ℤ'), mo('/'), mi(n), mi('ℤ'));
+  }
+
+  /** Überstrich – kennzeichnet Elemente von ℤ/nℤ. */
+  function overline(...children) {
+    // U+203E (Überstrich); notfalls durch U+00AF (Makron) ersetzbar.
+    return mml('mover', [mrow(...children), mo('\u203E')], { accent: 'true' });
+  }
+
+  /** Überstrichene Zahl eines Restklassenrings. */
+  const residue = (value) => overline(mn(value));
+
+  /** Liste überstrichener Zahlen, durch Kommas getrennt, als ein <math>. */
+  function residueList(values) {
+    return mathNode(...values.flatMap((value, index) => (
+      index === 0 ? [residue(value)] : [mo(','), residue(value)]
+    )));
+  }
+
+
+  /* =====================================================================
+     4 · Zustand und Speicherung
+     ===================================================================== */
+
+  const STORAGE_KEY = 'euklid-uebung:fortschritt:v1';
+
+  const state = {
+    tasks: { gcd: null, inverse: null, equation: null },
+    flags: {
+      gcd: { counted: false, solved: false },
+      inverse: { counted: false, solved: false },
+      equation: { counted: false, solved: false }
+    },
+    stats: {
+      gcd: { attempted: 0, solved: 0 },
+      inverse: { attempted: 0, solved: 0 },
+      equation: { attempted: 0, solved: 0 }
+    }
+  };
+
+
+  function loadStats() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      const saved = JSON.parse(raw);
+      ['gcd', 'inverse', 'equation'].forEach((key) => {
+        const entry = saved && saved[key];
+        if (!entry) return;
+        if (Number.isInteger(entry.attempted) && entry.attempted >= 0) {
+          state.stats[key].attempted = entry.attempted;
+        }
+        if (Number.isInteger(entry.solved) && entry.solved >= 0) {
+          state.stats[key].solved = Math.min(entry.solved, state.stats[key].attempted);
+        }
+      });
+    } catch (error) {
+      /* Kein Zugriff auf localStorage: Fortschritt bleibt dann flüchtig. */
+    }
+  }
+
+  function saveStats() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.stats));
+    } catch (error) {
+      /* bewusst ignoriert */
+    }
+  }
+
+  /* =====================================================================
+     5 · Kleine DOM-Helfer
+     ===================================================================== */
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+  /** Liest eine ganze Zahl; null bei ungültiger Eingabe. */
+  function readInteger(raw) {
+    const cleaned = String(raw)
+      .replace(/[\u2212\u2013\u2014]/g, '-')  // typografische Minuszeichen
+      .replace(/\s+/g, '')
+      .replace(/^\+/, '');
+
+    if (!/^-?\d{1,9}$/.test(cleaned)) return null;
+    return Number(cleaned);
+  }
+
+  /** Setzt den Prüfstatus eines Eingabefeldes: 'good' | 'bad' | 'warn' | 'idle'. */
+  function setFieldState(field, status) {
+    if (!field) return;
+
+    field.classList.remove('is-good', 'is-bad', 'is-warn');
+    if (status !== 'idle') field.classList.add(`is-${status}`);
+
+    const glyphs = { good: '✓', bad: '✗', warn: '!', idle: '' };
+    const mark = field.querySelector('.mark');
+    if (mark) mark.textContent = glyphs[status] || '';
+  }
+
+  /** Schreibt eine Rückmeldung; parts enthält Texte und MathML-Knoten. */
+  function setFeedback(target, kind, parts = []) {
+    target.classList.remove('is-good', 'is-bad', 'is-warn');
+    if (kind !== 'idle') target.classList.add(`is-${kind}`);
+    target.replaceChildren(...parts.map((part) => (
+      typeof part === 'string' ? document.createTextNode(part) : part
+    )));
+  }
+
+  /** Baut Text- und Formelzeilen (für die Beispiele) in ein Zielelement. */
+  function renderExampleLines(target, lines) {
+    const paragraphs = lines.map((line) => {
+      const paragraph = document.createElement('p');
+      paragraph.className = 'example-line';
+      if (typeof line === 'string') {
+        paragraph.textContent = line;
+      } else {
+        paragraph.append(mathNode(...line));
+      }
+      return paragraph;
+    });
+    target.replaceChildren(...paragraphs);
+  }
+
+  /* =====================================================================
+     6 · Abschnitt 1: Erweiterter euklidischer Algorithmus
+     ===================================================================== */
+
+     function renderGcdTask() {
+       const task = state.tasks.gcd;
+
+       renderMath($('#label-eea-a'), mi('a'));
+       renderMath($('#label-eea-b'), mi('b'));
+       $('#value-eea-a').textContent = String(task.a);
+       $('#value-eea-b').textContent = String(task.b);
+
+       renderMath(
+         $('#math-eea-gcd'),
+         gcdExpr(task.a, task.b), mo('='),
+         fieldSlot({
+           id: 'input-eea-gcd',
+           label: 'Wert des größten gemeinsamen Teilers',
+           placeholder: 'ggT',
+           width: '4.4rem'
+         })
+       );
+
+       renderMath(
+         $('#math-eea-bezout'),
+         fieldSlot({ id: 'input-eea-r', label: 'Koeffizient r', placeholder: 'r' }),
+         mo('·'), mn(task.a), mo('+'),
+         fieldSlot({ id: 'input-eea-s', label: 'Koeffizient s', placeholder: 's' }),
+         mo('·'), mn(task.b), mo('='),
+         gcdExpr(task.a, task.b)
+       );
+     }
+
+
+  function clearGcdForm() {
+    $$('#form-eea .field').forEach((field) => setFieldState(field, 'idle'));
+    $$('#form-eea .input').forEach((input) => { input.value = ''; });
+    setFeedback($('#feedback-eea'), 'idle');
+  }
+
+  function startGcdTask() {
+    state.tasks.gcd = createGcdTask();
+    state.flags.gcd = { counted: false, solved: false };
+    clearGcdForm();
+    renderGcdTask();
+  }
+
+  function handleGcdSubmit(event) {
+    event.preventDefault();
+
+    const task = state.tasks.gcd;
+    const gcdInput = $('#input-eea-gcd');
+    const rInput = $('#input-eea-r');
+    const sInput = $('#input-eea-s');
+    const feedback = $('#feedback-eea');
+
+    const gcdValue = readInteger(gcdInput.value);
+    const rValue = readInteger(rInput.value);
+    const sValue = readInteger(sInput.value);
+
+    const invalid = [
+      [gcdInput, gcdValue],
+      [rInput, rValue],
+      [sInput, sValue]
+    ].filter(([, value]) => value === null);
+
+    if (invalid.length > 0) {
+      $$('#form-eea .field').forEach((field) => setFieldState(field, 'idle'));
+      invalid.forEach(([input]) => setFieldState(input.closest('.field'), 'warn'));
+      setFeedback(feedback, 'warn', [
+        'Bitte gib in jedes Feld eine ganze Zahl ein, zum Beispiel 6, −1 oder 3.'
+      ]);
+      invalid[0][0].focus();
+      return;
+    }
+
+    recordAttempt('gcd');
+
+    const gcdOk = gcdValue === task.gcd;
+    const linearOk = rValue * task.a + sValue * task.b === task.gcd;
+
+    setFieldState(gcdInput.closest('.field'), gcdOk ? 'good' : 'bad');
+    setFieldState(rInput.closest('.field'), linearOk ? 'good' : 'bad');
+    setFieldState(sInput.closest('.field'), linearOk ? 'good' : 'bad');
+
+    if (gcdOk && linearOk) {
+      recordSolved('gcd');
+      setFeedback(feedback, 'good', [
+        'Richtig. Mit ',
+        mathNode(
+          mn(rValue), mo('·'), mn(task.a), mo('+'),
+          mn(sValue), mo('·'), mn(task.b), mo('='), mn(task.gcd)
+        ),
+        ' stimmen Koeffizienten und ggT.'
+      ]);
+      return;
+    }
+
+    if (gcdOk) {
+      const computed = rValue * task.a + sValue * task.b;
+      setFeedback(feedback, 'bad', [
+        'Der ggT stimmt, die Koeffizienten noch nicht: Bei dir ergibt sich ',
+        mathNode(
+          mnWithParentheses(rValue), mo('·'), mn(task.a), mo('+'),
+          mnWithParentheses(sValue), mo('·'), mn(task.b), mo('='), mn(computed)
+        ),
+        '. Es soll aber ',
+        mathNode(mn(task.gcd)),
+        ' herauskommen.'
+      ]);
+      return;
+    }
+
+    if (linearOk) {
+      setFeedback(feedback, 'bad', [
+        'Deine Koeffizienten passen zusammen – der eingetragene ggT ist aber nicht korrekt. Vergleiche ihn mit ',
+        mathNode(
+          mn(rValue), mo('·'), mn(task.a), mo('+'),
+          mn(sValue), mo('·'), mn(task.b), mo('='), mn(task.gcd)
+        ),
+        '.'
+      ]);
+      return;
+    }
+
+    setFeedback(feedback, 'bad', [
+      'Noch nicht richtig. Prüfe zuerst den ggT: Er ist der letzte von null verschiedene Rest im euklidischen Algorithmus.'
+    ]);
+  }
+
+  /* =====================================================================
+     7 · Abschnitt 2: Inverse im Restklassenring
+     ===================================================================== */
+
+  function renderInverseTask() {
+    const task = state.tasks.inverse;
+
+    renderMath($('#label-inv-a'), mi('a'));
+    renderMath($('#label-inv-n'), mi('n'));
+    $('#value-inv-a').textContent = String(task.a);
+    $('#value-inv-n').textContent = String(task.n);
+
+    renderMath(
+      $('#math-inv-prompt'),
+      mn(task.a), mo('·'), mi('x'), mo('≡'), mn(1), modTag(task.n)
+    );
+  }
+
+  function clearInverseForm() {
+    const xField = $('#input-inv-x').closest('.field');
+    setFieldState(xField, 'idle');
+    $('#input-inv-x').value = '';
+    setFeedback($('#feedback-inv'), 'idle');
+  }
+
+  function startInverseTask() {
+    state.tasks.inverse = createInverseTask();
+    state.flags.inverse = { counted: false, solved: false };
+
+    $('input[name="inv-exists"][value="yes"]').checked = true;
+    $('#input-inv-x').disabled = false;
+
+    clearInverseForm();
+    renderInverseTask();
+  }
+
+  /** Hält Eingabefeld und Auswahl synchron. */
+  function syncInverseChoice() {
+    const wantsNone = $('input[name="inv-exists"]:checked').value === 'no';
+    const xInput = $('#input-inv-x');
+
+    xInput.disabled = wantsNone;
+    setFieldState(xInput.closest('.field'), 'idle');
+    setFeedback($('#feedback-inv'), 'idle');
+  }
+
+  function handleInverseSubmit(event) {
+    event.preventDefault();
+
+    const task = state.tasks.inverse;
+    const feedback = $('#feedback-inv');
+    const xInput = $('#input-inv-x');
+    const xField = xInput.closest('.field');
+    const choice = $('input[name="inv-exists"]:checked').value;
+
+    if (choice === 'no') {
+      recordAttempt('inverse');
+      setFieldState(xField, 'idle');
+
+      if (task.invertible) {
+        setFeedback(feedback, 'bad', [
+          'Doch, ein Inverses existiert: ',
+          mathNode(gcdExpr(task.a, task.n), mo('='), mn(1)),
+          ', also ist ',
+          mathNode(mn(task.a)),
+          ' modulo ',
+          mathNode(mn(task.n)),
+          ' invertierbar.'
+        ]);
+      } else {
+        recordSolved('inverse');
+        setFeedback(feedback, 'good', [
+          'Richtig: ',
+          mathNode(gcdExpr(task.a, task.n), mo('='), mn(gcd(task.a, task.n)), mo('≠'), mn(1)),
+          ', deshalb gibt es kein Inverses.'
+        ]);
+      }
+      return;
+    }
+
+    const xValue = readInteger(xInput.value);
+
+    if (xValue === null) {
+      setFieldState(xField, 'warn');
+      setFeedback(feedback, 'warn', [
+        'Bitte gib das Inverse als ganze Zahl an – oder wähle „Es gibt kein Inverses“.'
+      ]);
+      xInput.focus();
+      return;
+    }
+
+    recordAttempt('inverse');
+
+    if (!task.invertible) {
+      setFieldState(xField, 'bad');
+      setFeedback(feedback, 'bad', [
+        'Hier gibt es kein Inverses, denn ',
+        mathNode(gcdExpr(task.a, task.n), mo('='), mn(gcd(task.a, task.n)), mo('≠'), mn(1)),
+        '. Keine ganze Zahl x kann die Kongruenz erfüllen.'
+      ]);
+      return;
+    }
+
+    const product = mod(task.a * xValue, task.n);
+    setFieldState(xField, product === 1 ? 'good' : 'bad');
+
+    if (product !== 1) {
+      setFeedback(feedback, 'bad', [
+        'Probe negativ: ',
+        mathNode(
+          mn(task.a), mo('·'), mn(xValue), mo('≡'),
+          mn(product), modTag(task.n)
+        ),
+        ' statt 1.'
+      ]);
+      return;
+    }
+
+    recordSolved('inverse');
+    const inRange = xValue >= 0 && xValue < task.n;
+
+    setFeedback(feedback, 'good', [
+      'Richtig: ',
+      mathNode(mn(task.a), mo('·'), mn(xValue), mo('≡'), mn(1), modTag(task.n)),
+      ', weil: ',
+      mathNode(mn(task.a), mo('·'), mn(xValue), mo('='), mn(task.a * xValue), mo('='), mn(1), mo('+'), mn((task.a * xValue-1) / task.n), mo('·'), mn(task.n)),
+      inRange
+        ? ''
+        : ` Gefordert ist der Repräsentant aus {0, …, ${task.n - 1}}.`
+    ]);
+  }
+
+  /* =====================================================================
+     7b · Abschnitt 3: Lineare Gleichungen in ℤ/nℤ
+     ===================================================================== */
+
+  /** „ggT(a, n) = d“ als Formel. */
+  function gcdWithValue(a, b) {
+    return mrow(gcdExpr(a, b), mo('='), mn(gcd(a, b)));
+  }
+
+  /** a̅·x + b̅ = c̅ */
+  function equationExpr(task) {
+    return mrow(
+      residue(task.a), mo('·'), mi('x'), mo('+'),
+      residue(task.b), mo('='), residue(task.c)
+    );
+  }
+
+  function renderEquationTask() {
+    const task = state.tasks.equation;
+
+    $('#eq3-prompt-line').replaceChildren(
+      document.createTextNode('Löse in '),
+      mathNode(mi('ℤ'), mo('/'), mn(task.n), mi('ℤ')),
+      document.createTextNode(':')
+    );
+
+    renderMath($('#eq3-equation'), equationExpr(task));
+    renderMath($('#math-eq3-answer'), mi('x'), mo('='));
+
+    $('#eq3-hint').textContent =
+      `Jeder Repräsentant aus {0, …, ${task.n - 1}}, der die Gleichung erfüllt, gilt als richtig.`;
+  }
+
+  function clearEquationForm() {
+    setFieldState($('#input-eq3-x').closest('.field'), 'idle');
+    $('#input-eq3-x').value = '';
+    setFeedback($('#feedback-eq3'), 'idle');
+  }
+
+  function startEquationTask() {
+    state.tasks.equation = createEquationTask();
+    state.flags.equation = { counted: false, solved: false };
+
+    $('input[name="eq3-solution"][value="yes"]').checked = true;
+    $('#input-eq3-x').disabled = false;
+
+    clearEquationForm();
+    renderEquationTask();
+  }
+
+  /** Hält Eingabefeld und Auswahl synchron. */
+  function syncEquationChoice() {
+    const wantsNone = $('input[name="eq3-solution"]:checked').value === 'no';
+    const xInput = $('#input-eq3-x');
+
+    xInput.disabled = wantsNone;
+    setFieldState(xInput.closest('.field'), 'idle');
+    setFeedback($('#feedback-eq3'), 'idle');
+  }
+
+  function handleEquationSubmit(event) {
+    event.preventDefault();
+
+    const task = state.tasks.equation;
+    const feedback = $('#feedback-eq3');
+    const xInput = $('#input-eq3-x');
+    const xField = xInput.closest('.field');
+    const choice = $('input[name="eq3-solution"]:checked').value;
+    const difference = mod(task.c - task.b, task.n);
+
+    /* --- Aussage „keine Lösung“ ------------------------------------- */
+    if (choice === 'no') {
+      recordAttempt('equation');
+      setFieldState(xField, 'idle');
+
+      if (task.solvable) {
+        const d = gcd(task.a, task.n);
+        setFeedback(feedback, 'bad', [
+          'Doch, die Gleichung ist lösbar: ',
+          mathNode(gcdWithValue(task.a, task.n), mo('∣'), residue(difference)),
+          d === 1
+            ? ' – der ggT teilt jede ganze Zahl, es gibt also genau eine Lösung.'
+            : ` – der ggT teilt die Differenz, es gibt also ${d} Lösungen.`
+        ]);
+      } else {
+        recordSolved('equation');
+        setFeedback(feedback, 'good', [
+          'Richtig, es gibt keine Lösung: ',
+          mathNode(gcdWithValue(task.a, task.n), mo('∤'), residue(difference)),
+          '. Die rechte Seite ',
+          mathNode(residue(task.c)),
+          ' wird nie erreicht – Durchprobieren bestätigt es: ',
+          residueList(imageValues(task.a, task.b, task.n)),
+          ' sind die einzigen Werte, die auftreten.'
+        ]);
+      }
+      return;
+    }
+
+    /* --- Zahleneingabe ---------------------------------------------- */
+    const x = readInteger(xInput.value);
+
+    if (x === null) {
+      setFieldState(xField, 'warn');
+      setFeedback(feedback, 'warn', [
+        `Bitte gib eine ganze Zahl aus {0, …, ${task.n - 1}} ein – oder wähle „Es gibt keine Lösung“.`
+      ]);
+      xInput.focus();
+      return;
+    }
+
+    const inRange = x >= 0 && x < task.n;
+    const matches = mod(task.a * x + task.b - task.c, task.n) === 0;
+
+    if (!matches) {
+      recordAttempt('equation');
+      setFieldState(xField, 'bad');
+      setFeedback(feedback, 'bad', [
+        'Probe negativ: ',
+        mathNode(
+          residue(task.a), mo('·'), inRange ? residue(x) : mn(x), mo('+'), residue(task.b),
+          mo('≡'), residue(mod(task.a * x + task.b, task.n)), modTag(task.n)
+        ),
+        ', gefordert ist ',
+        mathNode(residue(task.c)),
+        '.',
+        task.solvable ? '' : ' Tipp: Bei diesem kleinen Modul lohnt sich Durchprobieren.'
+      ]);
+      return;
+    }
+
+    /* --- richtige Kongruenz, aber kein Repräsentant aus dem Bereich -- */
+    if (!inRange) {
+      setFieldState(xField, 'warn');
+      setFeedback(feedback, 'warn', [
+        'Dein Wert löst die Kongruenz – verlangt ist aber der Repräsentant aus ',
+        `{0, …, ${task.n - 1}}. Es gilt `,
+        mathNode(mn(x), mo('≡'), residue(mod(x, task.n)), modTag(task.n)),
+        `, trag also ${mod(x, task.n)} ein.`
+      ]);
+      return;
+    }
+
+    /* --- vollständig richtig ---------------------------------------- */
+    recordAttempt('equation');
+    recordSolved('equation');
+    setFieldState(xField, 'good');
+
+    const d = gcd(task.a, task.n);
+    const parts = [
+      'Richtig: ',
+      mathNode(
+        residue(task.a), mo('·'), residue(x), mo('+'), residue(task.b),
+        mo('='), residue(task.a * x + task.b),
+        mo('='), residue(mod(task.a * x + task.b, task.n))
+      ),
+      ` in ℤ/${task.n}ℤ.`
+
+    ];
+
+    if (d === 1) {
+      parts.push(' Wegen ');
+      parts.push(mathNode(gcdWithValue(task.a, task.n)));
+      parts.push(` ist diese Lösung in ℤ/${task.n}ℤ eindeutig.`);
+    } else {
+
+      parts.push(`Es gibt ${task.solutions.length} Lösungen: `);
+      parts.push(residueList(task.solutions));
+      parts.push('.');
+    }
+
+    setFeedback(feedback, 'good', parts);
+  }
+
+  /* =====================================================================
+     8 · Fortschritt und Auswertung
+     ===================================================================== */
+
+  function recordAttempt(key) {
+    if (state.flags[key].counted) return;
+    state.flags[key].counted = true;
+    state.stats[key].attempted += 1;
+    saveStats();
+    updateDashboard();
+  }
+
+  function recordSolved(key) {
+    if (state.flags[key].solved) return;
+    state.flags[key].solved = true;
+    state.stats[key].solved += 1;
+    saveStats();
+    updateDashboard();
+  }
+
+  function setStepDone(sectionId, done) {
+    const step = $(`.step[data-target="${sectionId}"]`);
+    if (step) step.classList.toggle('is-done', done);
+  }
+
+  function summaryNote(stats) {
+    const keys = ['gcd', 'inverse', 'equation'];
+    const solvedCount = keys.filter((key) => stats[key].solved > 0).length;
+    const anyAttempt = keys.some((key) => stats[key].attempted > 0);
+
+    if (!anyAttempt) return 'Noch keine Aufgabe geprüft.';
+    if (solvedCount === 3) return 'Alle drei Aufgabentypen gemeistert. Neue Zahlen gefällig?';
+    if (solvedCount === 2) return 'Zwei von drei Abschnitten sitzen – einer fehlt noch.';
+    if (solvedCount === 1) return 'Ein Abschnitt ist geschafft. Die anderen warten noch.';
+    return 'Weiter dran – jede geprüfte Aufgabe zählt.';
+  }
+
+  function updateDashboard() {
+    const gcdStats = state.stats.gcd;
+    const inverseStats = state.stats.inverse;
+    const equationStats = state.stats.equation;
+
+    const attempted = gcdStats.attempted + inverseStats.attempted + equationStats.attempted;
+    const solved = gcdStats.solved + inverseStats.solved + equationStats.solved;
+    const rate = attempted === 0 ? 0 : Math.round((solved / attempted) * 100);
+
+    $('#progress-fill').style.width = `${rate}%`;
+    $('#progress-bar').setAttribute('aria-valuenow', String(rate));
+
+    setStepDone('step-1', gcdStats.solved > 0);
+    setStepDone('step-2', inverseStats.solved > 0);
+    setStepDone('step-3', equationStats.solved > 0);
+    setStepDone(
+      'step-4',
+      gcdStats.solved > 0 && inverseStats.solved > 0 && equationStats.solved > 0
+    );
+
+    $('#stat-tasks').textContent = String(attempted);
+    $('#stat-solved').textContent = String(solved);
+    $('#stat-rate').textContent = attempted === 0 ? '–' : `${rate} %`;
+    $('#stat-note').textContent = summaryNote(state.stats);
+
+    $('#breakdown-gcd').textContent = `${gcdStats.solved} / ${gcdStats.attempted}`;
+    $('#breakdown-inverse').textContent = `${inverseStats.solved} / ${inverseStats.attempted}`;
+    $('#breakdown-equation').textContent = `${equationStats.solved} / ${equationStats.attempted}`;
+  }
+
+  function resetProgress() {
+    state.stats = {
+      gcd: { attempted: 0, solved: 0 },
+      inverse: { attempted: 0, solved: 0 },
+      equation: { attempted: 0, solved: 0 }
+    };
+    state.flags = {
+      gcd: { counted: false, solved: false },
+      inverse: { counted: false, solved: false },
+      equation: { counted: false, solved: false }
+    };
+    saveStats();
+    updateDashboard();
+  }
+
+
+  /* =====================================================================
+     9 · Abschnittsnavigation
+     ===================================================================== */
+
+  const SECTION_IDS = ['step-1', 'step-2', 'step-3', 'step-4'];
+
+  function updateActiveSection() {
+    let activeId = SECTION_IDS[0];
+
+    SECTION_IDS.forEach((id) => {
+      const section = document.getElementById(id);
+      if (section && section.getBoundingClientRect().top <= 140) activeId = id;
+    });
+
+    $$('.step').forEach((step) => {
+      step.classList.toggle('is-active', step.dataset.target === activeId);
+    });
+  }
+
+  function bindNavigation() {
+    $$('.step').forEach((step) => {
+      step.addEventListener('click', () => {
+        const section = document.getElementById(step.dataset.target);
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateActiveSection();
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  /* =====================================================================
+     10 · Beispiele (statisch, aber in MathML gesetzt)
+     ===================================================================== */
+
+  function renderGcdExample() {
+    renderExampleLines($('#example-eea'), [
+      'Divisionsschema für a = 48 und b = 18:',
+      [mn(48), mo('='), mn(2), mo('·'), mn(18), mo('+'), mn(12)],
+      [mn(18), mo('='), mn(1), mo('·'), mn(12), mo('+'), mn(6)],
+      [mn(12), mo('='), mn(2), mo('·'), mn(6), mo('+'), mn(0)],
+      'Der letzte von null verschiedene Rest ist der ggT:',
+      [gcdExpr(48, 18), mo('='), mn(6)],
+      'Rückwärtseinsetzen:',
+      [
+        mn(6), mo('='), mn(18), mo('−'), mn(1), mo('·'), mn(12), mo('='),
+        mn(18), mo('−'), mn(1), mo('·'),
+        mrow(mo('('), mn(48), mo('−'), mn(2), mo('·'), mn(18), mo(')')),
+        mo('='), mn(3), mo('·'), mn(18), mo('−'), mn(1), mo('·'), mn(48)
+      ],
+      [
+        mo('('), mo('−'), mn(1), mo(')'), mo('·'), mn(48), mo('+'),
+        mn(3), mo('·'), mn(18), mo('='), mn(6)
+      ],
+      'Also r = −1 und s = 3. Auch jedes Paar r = −1 + 3k, s = 3 − 8k ist richtig.'
+    ]);
+  }
+
+  function renderInverseExample() {
+    renderExampleLines($('#example-inv'), [
+      'Gesucht: das Inverse von 3 modulo 7.',
+      [mn(3), mo('·'), mi('x'), mo('≡'), mn(1), modTag(7)],
+      'Euklidischer Algorithmus für 7 und 3:',
+      [mn(7), mo('='), mn(2), mo('·'), mn(3), mo('+'), mn(1)],
+      [mn(3), mo('='), mn(3), mo('·'), mn(1), mo('+'), mn(0)],
+      'Rückwärtseinsetzen:',
+      [mn(1), mo('='), mn(7), mo('−'), mn(2), mo('·'), mn(3)],
+      'Modulo 7 gelesen:',
+      [mn(1), mo('≡'), mnWithParentheses(-2), mo('·'), mn(3), modTag(7) ],
+      'Und weil -2  ≡ 5 (mod 7) gilt, ist 5 das gesuchte Inverse.',
+      'Probe: ',
+      [mn(3), mo('·'), mn('5'), mo('='), mn('15'),mo('≡'), mn(1), modTag(7)],
+      'Kein multiplikatives Inverses hat z.B. 4 modulo 8, denn ggT(4, 8) = 2 ≠ 1.'
+    ]);
+  }
+
+  function renderEquationExample() {
+    renderExampleLines($('#example-eq3'), [
+      'Gesucht ist die Lösung von',
+      [residue(5), mo('·'), mi('x'), mo('+'), residue(2), mo('='), residue(8)],
+      'in ℤ/11ℤ. Zuerst subtrahiert man den konstanten Term auf beiden Seiten:',
+      [residue(5), mo('·'), mi('x'), mo('='), residue(8), mo('−'), residue(2)],
+      [residue(5), mo('·'), mi('x'), mo('='), residue(6)],
+
+      'Wegen ggT(5, 11) = 1 gibt es genau eine Lösung. Das Inverse von 5 modulo 11 ist 9, denn 5 · 9 = 45 ≡ 1 (mod 11):',
+      [mi('x'), mo('='), residue(9), mo('·'), residue(6), mo('='), residue(54), mo('='), residue(10), mspace('1em'), mtext('in'), mspace('0.5em'), modTag2(11)],
+      'Probe: 5 · 10 + 2 = 52 ≡ 8 (mod 11). Der geforderte Repräsentant ist also 10.',
+
+    ]);
+  }
+
+
+  /* =====================================================================
+     11 · Start
+     ===================================================================== */
+
+     function init() {
+       loadStats();
+
+       renderGcdExample();
+       renderInverseExample();
+       renderEquationExample();
+
+       startGcdTask();
+       startInverseTask();
+       startEquationTask();
+
+       $('#form-eea').addEventListener('submit', handleGcdSubmit);
+       $('#btn-eea-clear').addEventListener('click', clearGcdForm);
+       $('#btn-eea-new').addEventListener('click', startGcdTask);
+
+       $('#form-inv').addEventListener('submit', handleInverseSubmit);
+       $('#btn-inv-clear').addEventListener('click', clearInverseForm);
+       $('#btn-inv-new').addEventListener('click', startInverseTask);
+       $$('input[name="inv-exists"]').forEach((radio) => {
+         radio.addEventListener('change', syncInverseChoice);
+       });
+
+       $('#form-eq3').addEventListener('submit', handleEquationSubmit);
+       $('#btn-eq3-clear').addEventListener('click', clearEquationForm);
+       $('#btn-eq3-new').addEventListener('click', startEquationTask);
+       $$('input[name="eq3-solution"]').forEach((radio) => {
+         radio.addEventListener('change', syncEquationChoice);
+       });
+
+       $('#btn-reset-progress').addEventListener('click', resetProgress);
+
+       bindNavigation();
+       updateDashboard();
+       updateActiveSection();
+     }
+
+
+  init();
+})();
+</script>
+</body>
+</html>
