@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP-Adressen – Übungsblatt</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --primary: #4a90d9;
+    --primary-dark: #2f6cb3;
+    --accent: #ffb74d;
+    --good: #66bb6a;
+    --good-bg: #e8f5e9;
+    --bad: #ef5350;
+    --bad-bg: #ffebee;
+    --text: #2c3e50;
+    --muted: #7a8a99;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    text-align: center;
+    padding: 28px 16px 20px;
+  }
+  header h1 { font-size: 1.7rem; letter-spacing: 0.5px; }
+  header p { opacity: 0.9; font-size: 0.95rem; margin-top: 4px; }
+
+  /* ---------- Tabs (Pagination für weitere Themen) ---------- */
+  nav.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: -18px auto 0;
+    max-width: 640px;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .tab {
+    border: none;
+    cursor: pointer;
+    padding: 10px 22px;
+    border-radius: 20px 20px 0 0;
+    background: #dde7f2;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab.active {
+    background: var(--card);
+    color: var(--primary-dark);
+  }
+  .tab:disabled { cursor: not-allowed; opacity: 0.7; }
+  .tab:not(:disabled):hover { background: #cddcf0; }
+
+  /* ---------- Inhalt ---------- */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.25s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 14px rgba(44, 62, 80, 0.08);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+
+  .card h2 { font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 10px; }
+
+  /* ---------- Merkkasten ---------- */
+  .merk {
+    background: #eaf2fc;
+    border-left: 5px solid var(--primary);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+  }
+  .merk code, .ip-display {
+    font-family: "Consolas", "Courier New", monospace;
+    background: #fff;
+    border: 1px solid #d5e2f0;
+    border-radius: 6px;
+    padding: 1px 7px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    white-space: nowrap;
+  }
+
+  /* ---------- Visualisierung: 4 Blöcke ---------- */
+  .blocks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 18px 0 6px;
+    flex-wrap: wrap;
+  }
+  .block {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    box-shadow: 0 3px 8px rgba(74, 144, 217, 0.4);
+  }
+  .block small { font-size: 0.6rem; font-weight: 400; opacity: 0.85; }
+  .dot { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+  .blocks-caption {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+
+  /* ---------- Übung ---------- */
+  .ip-display {
+    display: block;
+    text-align: center;
+    font-size: 1.9rem;
+    padding: 14px;
+    margin: 6px 0 4px;
+    letter-spacing: 1px;
+    word-break: break-all;
+    white-space: normal;
+  }
+  .frage { text-align: center; font-weight: 600; margin: 12px 0 16px; }
+
+  .btn-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  button.action {
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 12px 30px;
+    border-radius: 999px;
+    color: #fff;
+    transition: transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+  button.action:hover:not(:disabled) { transform: translateY(-2px); }
+  button.action:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+  .btn-good { background: var(--good); }
+  .btn-bad  { background: var(--bad); }
+  .btn-next { background: var(--primary); display: none; margin: 0 auto; }
+
+  /* ---------- Feedback ---------- */
+  .feedback {
+    display: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 18px;
+    font-size: 0.98rem;
+  }
+  .feedback.show { display: block; animation: fadeIn 0.2s ease; }
+  .feedback.good { background: var(--good-bg); border: 1px solid var(--good); color: #1b5e20; }
+  .feedback.bad  { background: var(--bad-bg);  border: 1px solid var(--bad);  color: #b71c1c; }
+  .feedback strong { display: block; margin-bottom: 2px; }
+
+  /* ---------- Zähler ---------- */
+  .counter {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+  .counter .stat {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 3px 10px rgba(44, 62, 80, 0.08);
+    padding: 12px 26px;
+    min-width: 130px;
+  }
+  .counter .zahl { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+  .counter .label { font-size: 0.82rem; color: var(--muted); }
+
+  .placeholder { text-align: center; color: var(--muted); padding: 40px 10px; }
+  .placeholder .big { font-size: 2.6rem; display: block; margin-bottom: 10px; }
+
+  /* ---------- Kapitel 0: Netzwerk-Schaubild ---------- */
+  .netz {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 16px 0 4px;
+  }
+  .netz .knoten {
+    background: #eaf2fc;
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .netz .pfeil { color: var(--primary-dark); font-weight: 800; }
+  .netz .zentrale { background: #fff3e0; border-color: var(--accent); }
+  .netz-caption { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 8px; }
+
+  /* ---------- DNS: Reihenfolge-Aufgabe ---------- */
+  .pool {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .step-card {
+    background: #fdf6ec;
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.15s, transform 0.1s;
+    user-select: none;
+  }
+  .step-card:hover { background: #fbeed7; transform: translateX(4px); }
+  .step-card.chosen { opacity: 0.45; cursor: default; }
+  .step-card.chosen:hover { transform: none; background: #fdf6ec; }
+  .order-title { font-size: 0.95rem; color: var(--muted); margin: 6px 0 8px; }
+  .order-list {
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 20px;
+  }
+  .order-list li {
+    counter-increment: step;
+    background: #eaf2fc;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 10px 14px 10px 44px;
+    position: relative;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .order-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px; height: 24px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .order-list li.correct { background: var(--good-bg); border-color: var(--good); }
+  .order-list li.wrong   { background: var(--bad-bg);  border-color: var(--bad); }
+
+  /* ---------- HTML-Live-Editor ---------- */
+  .code-example {
+    background: #263238;
+    color: #eceff1;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 8px 0;
+  }
+  .code-example .tag { color: #80cbc4; }
+  .code-example .attr { color: #ffcc80; }
+  .editor-wrap {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media (max-width: 620px) { .editor-wrap { grid-template-columns: 1fr; } }
+  .editor-label {
+    font-size: 0.8rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  textarea#htmlCode {
+    width: 100%;
+    min-height: 300px;
+    resize: vertical;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    padding: 12px;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    background: #263238;
+    color: #eceff1;
+  }
+  textarea#htmlCode:focus { outline: none; border-color: var(--accent); }
+  iframe#htmlPreview {
+    width: 100%;
+    min-height: 300px;
+    border: 2px solid #d5e2f0;
+    border-radius: 10px;
+    background: #fff;
+  }
+  .snippet-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+  .snippet-btn {
+    border: 1px solid var(--primary);
+    background: #eaf2fc;
+    color: var(--primary-dark);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .snippet-btn:hover { background: #d5e6f8; }
+
+  /* ---------- Anleitung: eigene Dateien ---------- */
+  .copy-block { position: relative; margin: 10px 0 18px; }
+  .copy-block pre {
+    background: #263238;
+    color: #eceff1;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    overflow-x: auto;
+    white-space: pre;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    border: none;
+    border-radius: 6px;
+    background: #4a90d9;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: #2f6cb3; }
+  .schritt { margin: 10px 0 10px 20px; }
+  .schritt li { margin-bottom: 6px; }
+  code.inline {
+    background: #eaf2fc;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.9em;
+    color: #2f6cb3;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 18px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Aufbau und Funktionsweise des Internets</h1>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-page="internet">Das Internet</button>
+  <button class="tab" data-page="ip">IP-Adressen</button>
+  <button class="tab" data-page="dns">DNS</button>
+  <button class="tab" data-page="html">Webseiten aufbauen</button>
+</nav>
+
+<main>
+
+  <!-- ================= Seite 0: Aufbau des Internets ================= -->
+  <section class="page active" id="page-internet">
+
+    <div class="card">
+      <h2>🌍 Was ist das Internet?</h2>
+      <p>
+        Das Internet ist ein <strong>riesiger Verbund von Computern</strong> auf der ganzen Welt.
+        Die meisten Geräte sind dabei <strong>per Kabel</strong> miteinander verbunden - z.B. Seekabel auf dem Meeresboden.
+      </p>
+      <div class="merk">
+        Stell dir das Internet als <strong>„Netzwerk von Netzwerken“</strong> vor:
+        Zu Hause hast du ein kleines Netzwerk (dein WLAN), in der Schule ein größeres –
+        und all diese Netzwerke sind weltweit miteinander verbunden. Deshalb heißt es auch
+        <strong>Inter</strong>-net: das Netz <em>zwischen</em> den Netzen.
+      </div>
+
+     <h2> Wichtige Gerätetypen im Internet </h2>
+
+    <div class="card">
+      <h2>📱 Privatgeräte – die Geräte von uns allen</h2>
+      <p>
+        <strong>Privatgeräte</strong> sind die Geräte, die wir täglich benutzen:
+        Computer, Laptops, Smartphones, Tablets, Drucker oder Smart-TVs. Sie sind meistens
+        nur zeitweise eingeschaltet und <strong>verbinden sich über WLAN oder Kabel</strong>
+        mit dem Internet.
+      </p>
+      <p>
+        Anders als ein Server stellen Privatgeräte meist keine Inhalte für alle bereit.
+        Stattdessen <strong>fragen sie Inhalte bei Servern ab</strong> – zum Beispiel eine
+        Webseite, ein Video oder eine Nachricht.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>🖥️ Server – die Computer, die etwas bereitstellen</h2>
+      <p>
+        Ein <strong>Server</strong> ist ein Computer, der <strong>rund um die Uhr eingeschaltet</strong>
+        ist und anderen Computern etwas zur Verfügung stellt – zum Beispiel Webseiten,
+        Videos oder E-Mails. Wenn du eine Webseite aufrufst, holst du sie dir von einem
+        solchen Server.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>🧭 Router – die Wegweiser im Netzwerk</h2>
+      <p>
+        Ein <strong>Router</strong> sorgt dafür, dass Daten den <strong>richtigen Weg</strong> finden.
+        Stell dir einen Router wie eine <strong>Wegkreuzung</strong> vor: Datenpakete kommen an
+        und der Router entscheidet, wohin sie als Nächstes müssen, damit sie ihr Ziel erreichen.
+        Zu Hause verbindet dein Router außerdem all deine Geräte mit dem Internet.
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- ================= Seite 1: IP-Adressen ================= -->
+  <section class="page" id="page-ip">
+
+    <div class="card">
+      <h2>📮 Was ist eine IP-Adresse?</h2>
+      <p>
+        Jedes Gerät (Computer, Handy, Drucker), das direkt mit dem Internet verbunden ist, hat eine eigene
+        <strong>IP-Adresse</strong>. Man kann sie sich wie eine normale Adresse vorstellen.
+        Wenn ein Gerät einem anderen Gerät ein Informationspaket schicken möchte, dann muss der Sender die (IP-)Adresse des Empfängers kennen.
+      </p>
+      <div class="merk">
+        Eine <strong>IPv4-Adresse</strong> besteht aus <strong>vier Zahlenblöcken</strong>
+        (genannt <em>Oktette</em>), getrennt durch <strong>Punkte</strong>.
+        Jeder Block ist eine Zahl von <strong>0 bis 255</strong>.<br>
+        ✅ Beispiel: <code>192.168.0.1</code><br>
+        ❌ Beispiel: <code>300.10.5.2</code> – 300 ist größer als 255!
+      </div>
+
+      <div class="blocks">
+        <div class="block">192<small>0–255</small></div><span class="dot">.</span>
+        <div class="block">168<small>0–255</small></div><span class="dot">.</span>
+        <div class="block">0<small>0–255</small></div><span class="dot">.</span>
+        <div class="block">1<small>0–255</small></div>
+      </div>
+      <p class="blocks-caption">Vier Blöcke mit Zahlen von 0–255, durch Punkte getrennt</p>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Übung: Gültige Adresse?</h2>
+      <p>Entscheide bei jeder zufällig erzeugten Adresse: Ist sie eine <strong>gültige IPv4-Adresse</strong>?</p>
+
+      <span class="ip-display" id="ipDisplay">–</span>
+      <p class="frage">Ist diese Adresse gültig? 🤔</p>
+
+      <div class="btn-row">
+        <button class="action btn-good" id="btnGueltig">Gültig</button>
+        <button class="action btn-bad"  id="btnUngueltig">Ungültig</button>
+        <button class="action btn-next" id="btnNext">➡️ Nächste Aufgabe</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="counter">
+      <div class="stat">
+        <div class="zahl" id="countDone">0</div>
+        <div class="label">Aufgaben bearbeitet 📝</div>
+      </div>
+      <div class="stat">
+        <div class="zahl" id="countRight">0</div>
+        <div class="label">davon richtig 🎉</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= Seite 2: DNS ================= -->
+  <section class="page" id="page-dns">
+
+    <div class="card">
+      <h2>🔍 Was ist DNS?</h2>
+      <p>
+        Wenn ein Gerät <code class="inline">S</code> ein Paket über das Internet an ein Gerät <code class="inline">E</code> senden möchte, dann muss <code class="inline">S</code> die IP-Adresse von <code class="inline">E</code> kennen. Zum Beispiel könnte dein Smartphone das Gerät <code class="inline">S</code class="inline"> sein, das dem Web-Server <code class="inline">E</code> die folgende Nachricht schickt: Sende mir die Hauptseite von <code class="inline">www.youtube.com</code>.  <br/>
+        Ziemlich sicher kennst du aber nicht die IP-Adresse des Web-Servers, auf dem der Inhalt für <code class="inline">www.youtube.com</code> gespeichert ist. Und dein Smartphone kennt sie zunächst auch nicht.
+        Genau dafür gibt es das (<em>Domain Name System</em>) <strong>(DNS)</strong>.
+        Es übersetzt Domain-Namen in die zugehörige IP-Adresse.
+      </p>
+      <div class="merk">
+        <strong>Ablauf kurz erklärt:</strong> Du gibst <code>www.ard.de</code> ein →
+        dein Gerät fragt einen DNS-Server nach der passenden IP-Adresse → der DNS-Server
+        antwortet z.&nbsp;B. <code>23.218.170.172</code> → dein Gerät ruft die Webseite
+        über diese IP-Adresse ab.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Aufgabe: Bringe den Ablauf in die richtige Reihenfolge</h2>
+      <p>Klicke die Kärtchen unten in der richtigen Reihenfolge an – sie wandern dann in
+      dein Feld „Deine Reihenfolge“. Ein Klick auf ein Kärtchen in der Reihenfolge schickt
+      es zurück.</p>
+
+      <div class="pool" id="dnsPool"></div>
+
+      <h3 class="order-title">Deine Reihenfolge 👇</h3>
+      <ol class="order-list" id="dnsOrder"></ol>
+
+      <div class="btn-row" style="margin-top:16px">
+        <button class="action btn-good" id="dnsCheck">✅ Prüfen</button>
+        <button class="action" id="dnsReset" style="display:inline-block;background:var(--accent);color:#4e342e">🔀 Neu mischen</button>
+      </div>
+
+      <div class="feedback" id="dnsFeedback"></div>
+    </div>
+
+  </section>
+
+  <!-- ================= Seite 3: HTML / Aufbau von Webseiten ================= -->
+  <section class="page" id="page-html">
+
+    <div class="card">
+      <h2>🧱 Webseiten sind nur Text</h2>
+      <p>
+        Eine Webseite ist im Grunde <strong>reiner Text</strong> – erst der
+        <strong>Browser</strong> macht daraus eine schöne, bunte Seite mit Überschriften,
+        Bildern und Links. Der Text enthält dafür kleine <strong>Befehle</strong>, die in
+        spitze Klammern geschrieben werden, z.&nbsp;B. <code>&lt;h1&gt;</code>.
+      </p>
+      <div class="merk">
+        Du siehst den Text mit den Befehlen – der Browser zeigt das Ergebnis. Probiere es
+        unten selbst aus: Ändere den Text im linken Feld und schaue, was rechts passiert!
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Bausteine von Webseiten</h2>
+
+      <p><strong>Überschrift:</strong> <code>&lt;h1&gt;Titel&lt;/h1&gt;</code> – große Überschrift
+      (<code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code> werden kleiner)</p>
+      <div class="code-example">&lt;h1&gt;Meine erste Webseite&lt;/h1&gt;</div>
+
+      <p><strong>Text (Absatz):</strong> <code>&lt;p&gt;Beliebiger Text&lt;/p&gt;</code></p>
+      <div class="code-example">&lt;p&gt;Das ist ein einfacher Absatz.&lt;/p&gt;</div>
+
+      <p><strong>Link:</strong> <code>&lt;a href="ADRESSE"&gt;Anzeigetext&lt;/a&gt;</code> –
+      <code>href</code> enthält die Ziel-URL</p>
+      <div class="code-example">&lt;a href="https://www.ard.de"&gt;Zur ARD&lt;/a&gt;</div>
+
+      <p><strong>Bild:</strong> <code>&lt;img src="BILD-ADRESSE" alt="Beschreibung"&gt;</code> –
+      <code>src</code> enthält die Adresse des Bildes</p>
+      <div class="code-example">&lt;img src="https://picsum.photos/300/150" alt="Zufallsbild"&gt;</div>
+    </div>
+
+    <div class="card">
+      <h2>🧪 Ausprobieren: Dein eigener Webseiten-Text</h2>
+      <p>Bearbeite den Text links – rechts siehst du sofort das Ergebnis. Tipp: Probiere die
+      vier Bausteine aus, indem du z.&nbsp;B. die Überschrift änderst oder ein Bild einfügst!</p>
+
+      <div class="editor-wrap">
+        <div>
+          <div class="editor-label">Dein Text (HTML)</div>
+          <textarea id="htmlCode" spellcheck="false"></textarea>
+        </div>
+        <div>
+          <div class="editor-label">So zeigt der Browser es an</div>
+          <iframe id="htmlPreview" title="Vorschau" sandbox="allow-same-origin"></iframe>
+        </div>
+      </div>
+
+      <div class="snippet-btns">
+        <button class="snippet-btn" data-snippet="h1">&lt;h1&gt; einfügen</button>
+        <button class="snippet-btn" data-snippet="p">&lt;p&gt; einfügen</button>
+        <button class="snippet-btn" data-snippet="a">&lt;a&gt; einfügen</button>
+        <button class="snippet-btn" data-snippet="img">&lt;img&gt; einfügen</button>
+        <button class="snippet-btn" data-snippet="reset">↺ Ausgangszustand</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💾 Weiter experimentieren: Deine eigene Webseite auf dem PC</h2>
+      <p>
+        Jetzt wird es spannend: Du erstellst eine <strong>echte Webseite als Datei</strong>
+        auf deinem eigenen Computer. Dafür brauchst du <strong>zwei Dateien im selben Ordner</strong>:
+        eine HTML-Datei (der Inhalt) und eine CSS-Datei (das Aussehen).
+      </p>
+
+      <ol class="schritt">
+        <li>Erstelle auf deinem PC einen neuen Ordner, z.&nbsp;B. <code class="inline">meine-webseite</code> auf dem Desktop.</li>
+        <li>Öffne einen einfachen Texteditor (z.&nbsp;B. den Editor von Windows oder Notepad++). <em>Nicht</em> Word verwenden!</li>
+        <li>Erstelle eine Datei namens <code class="inline">index.html</code>, kopiere den folgenden Text hinein und speichere sie <strong>in deinem Ordner</strong>.</li>
+        <li>Erstelle eine zweite Datei namens <code class="inline">styles.css</code>, kopiere den CSS-Text hinein und speichere sie ebenfalls im Ordner.</li>
+        <li>Öffne die Datei <code class="inline">index.html</code> mit einem <strong>Doppelklick</strong> – sie wird im Browser angezeigt.</li>
+        <li>Ändere Texte und Farben, speichere und lade die Seite im Browser neu (F5). So siehst du sofort, was sich geändert hat!</li>
+      </ol>
+
+      <h3 style="margin:14px 0 4px">📄 Datei 1: <code class="inline">index.html</code></h3>
+      <div class="copy-block">
+        <button class="copy-btn" data-copy="html">📋 Kopieren</button>
+        <pre id="codeHtml">&lt;!DOCTYPE html&gt;
+&lt;html lang="de"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Meine Webseite&lt;/title&gt;
+  &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;header&gt;
+    &lt;h1&gt;🙂 Meine Webseite&lt;/h1&gt;
+    &lt;nav&gt;
+      &lt;a href="#ueber-mich"&gt;Über mich&lt;/a&gt;
+      &lt;a href="#links"&gt;Lieblings-Links&lt;/a&gt;
+      &lt;a href="#bild"&gt;Bild&lt;/a&gt;
+    &lt;/nav&gt;
+  &lt;/header&gt;
+
+  &lt;main&gt;
+    &lt;section id="ueber-mich" class="karte"&gt;
+      &lt;h2&gt;Über mich&lt;/h2&gt;
+      &lt;p&gt;Hier steht bald etwas über mich – Name, Klasse, Hobbys ...&lt;/p&gt;
+    &lt;/section&gt;
+
+    &lt;section id="links" class="karte"&gt;
+      &lt;h2&gt;Meine Lieblings-Links&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href="https://www.ard.de" target="_blank"&gt;ARD&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="https://de.wikipedia.org" target="_blank"&gt;Wikipedia&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="https://www.leifiphysik.de" target="_blank"&gt;Leifi Physik&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+
+    &lt;section id="bild" class="karte"&gt;
+      &lt;h2&gt;Ein Bild&lt;/h2&gt;
+      &lt;img src="https://picsum.photos/400/200" alt="Zufallsbild"&gt;
+      &lt;p class="bildtext"&gt;Das Bild kommt von picsum.photos.&lt;/p&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+
+  &lt;footer&gt;
+    &lt;p&gt;Erstellt mit HTML und CSS – viel Spaß beim Ausprobieren!&lt;/p&gt;
+  &lt;/footer&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      </div>
+
+      <h3 style="margin:14px 0 4px">🎨 Datei 2: <code class="inline">styles.css</code></h3>
+      <div class="copy-block">
+        <button class="copy-btn" data-copy="css">📋 Kopieren</button>
+        <pre id="codeCss">/* ===== Grundgerüst ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f7fb;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+/* ===== Kopfbereich ===== */
+header {
+  background: linear-gradient(135deg, #4a90d9, #2f6cb3);
+  color: #ffffff;
+  text-align: center;
+  padding: 30px 16px 20px;
+}
+
+header h1 {
+  margin-bottom: 12px;
+}
+
+nav a {
+  color: #ffffff;
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Hauptbereich ===== */
+main {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 0 16px;
+}
+
+.karte {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(44, 62, 80, 0.1);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.karte h2 {
+  color: #2f6cb3;
+  margin-bottom: 8px;
+}
+
+.karte ul {
+  margin-left: 20px;
+}
+
+.karte a {
+  color: #2f6cb3;
+}
+
+.karte img {
+  max-width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.bildtext {
+  font-size: 0.85rem;
+  color: #7a8a99;
+  margin-top: 6px;
+}
+
+/* ===== Fußbereich ===== */
+footer {
+  text-align: center;
+  color: #7a8a99;
+  font-size: 0.85rem;
+  padding: 20px;
+}</pre>
+      </div>
+
+      <div class="merk">
+        <strong>Wichtig:</strong> Beide Dateien müssen im <strong>gleichen Ordner</strong> liegen,
+        sonst findet die HTML-Datei die CSS-Datei nicht. Probiere aus: Ändere z.&nbsp;B. die
+        Hintergrundfarbe von <code class="inline">body</code> oder die Farbe der Überschrift!
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>Informatik 7 · Thema: Internet-Adressen</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Tab-Navigation (Pagination) ---------- */
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      if (tab.disabled) return;
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("page-" + tab.dataset.page).classList.add("active");
+    });
+  });
+
+  /* ---------- IP-Generator ---------- */
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function randomValidOctet() { return String(randomInt(0, 255)); }
+
+  // Erzeugt eine zufällige gültige IPv4-Adresse
+  function randomValidIP() {
+    return [0, 1, 2, 3].map(randomValidOctet).join(".");
+  }
+
+  // Erzeugt eine zufällige UNgültige "Adresse" (verschiedene Fehlertypen)
+  function randomInvalidIP() {
+    const type = randomInt(0, 4);
+    const o = [randomValidOctet(), randomValidOctet(), randomValidOctet(), randomValidOctet()];
+    switch (type) {
+      case 0: // ein Block zu groß (> 255)
+        o[randomInt(0, 3)] = String(randomInt(256, 999));
+        return o.join(".");
+      case 1: // nur drei Blöcke
+        return o.slice(0, 3).join(".");
+      case 2: // fünf Blöcke
+        return o.concat([randomValidOctet()]).join(".");
+      case 3: // Buchstaben statt Zahl
+        o[randomInt(0, 3)] = randomInt(1, 99) + String.fromCharCode(97 + randomInt(0, 25));
+        return o.join(".");
+      default: // leerer Block (z. B. "1..2.3")
+        o[randomInt(0, 3)] = "";
+        return o.join(".");
+    }
+  }
+
+  // Mischt gültige und ungültige Adressen (50/50)
+  function generateAddress() {
+    const valid = Math.random() < 0.5;
+    return { text: valid ? randomValidIP() : randomInvalidIP(), valid: valid };
+  }
+
+  /* ---------- Prüfung (für das Feedback) ---------- */
+  function isValidIPv4(addr) {
+    const parts = addr.split(".");
+    if (parts.length !== 4) return false;
+    return parts.every(function (p) {
+      if (!/^\d+$/.test(p)) return false;      // nur Ziffern
+      if (p.length > 1 && p[0] === "0") return false; // keine führenden Nullen wie "01"
+      const n = Number(p);
+      return n >= 0 && n <= 255;
+    });
+  }
+
+  function erklaerung(addr) {
+    const parts = addr.split(".");
+    if (parts.length !== 4) {
+      return "Eine IPv4-Adresse braucht genau vier Blöcke, getrennt durch Punkte – hier sind es " + parts.length + ".";
+    }
+    for (const p of parts) {
+      if(p == "") {
+        return "Kein Block darf leer sein.";
+      }
+      if (!/^\d+$/.test(p)) return "„" + p + "“ enthält keine reine Zahl – nur Ziffern sind erlaubt.";
+      const n = Number(p);
+      if (n > 255) return "Der Block „" + p + "“ ist größer als 255 – erlaubt sind nur Zahlen von 0 bis 255.";
+      if (n < 0) return "Der Block „" + p + "“ ist negativ – erlaubt sind nur Zahlen von 0 bis 255.";
+    }
+    return "Alle vier Blöcke sind Zahlen von 0 bis 255 – die Adresse ist gültig.";
+  }
+
+  /* ---------- Übungslogik ---------- */
+  const ipDisplay  = document.getElementById("ipDisplay");
+  const btnGueltig = document.getElementById("btnGueltig");
+  const btnUngueltig = document.getElementById("btnUngueltig");
+  const btnNext    = document.getElementById("btnNext");
+  const feedback   = document.getElementById("feedback");
+  const countDone  = document.getElementById("countDone");
+  const countRight = document.getElementById("countRight");
+
+  let current = null;
+  let done = 0;
+  let right = 0;
+  let answered = false;
+
+  function naechsteAufgabe() {
+    current = generateAddress();
+    answered = false;
+    ipDisplay.textContent = current.text;
+    feedback.className = "feedback";
+    feedback.textContent = "";
+    btnGueltig.disabled = false;
+    btnUngueltig.disabled = false;
+    btnNext.style.display = "none";
+  }
+
+  function antworten(gewaehltGueltig) {
+    if (answered) return;
+    answered = true;
+    done++;
+    const richtig = (gewaehltGueltig === current.valid);
+    if (richtig) right++;
+
+    btnGueltig.disabled = true;
+    btnUngueltig.disabled = true;
+    btnNext.style.display = "inline-block";
+
+    feedback.className = "feedback show " + (richtig ? "good" : "bad");
+    feedback.innerHTML = richtig
+      ? "<strong>✅ Richtig!</strong> " + erklaerung(current.text)
+      : "<strong>❌ Leider falsch.</strong> " + erklaerung(current.text);
+
+    countDone.textContent = done;
+    countRight.textContent = right;
+  }
+
+  btnGueltig.addEventListener("click",  function () { antworten(true);  });
+  btnUngueltig.addEventListener("click", function () { antworten(false); });
+  btnNext.addEventListener("click", naechsteAufgabe);
+
+  /* ---------- DNS: Reihenfolge-Aufgabe ---------- */
+  const dnsSteps = [
+    "Du gibst www.ard.de im Browser ein.",
+    "Dein Gerät fragt den DNS-Server: „Welche IP-Adresse hat www.ard.de?“",
+    "Der DNS-Server antwortet: „www.ard.de hat die IP-Adresse 23.218.170.172.“",
+    "Dein Gerät baut über diese IP-Adresse eine Verbindung zum Webserver auf.",
+    "Der Webserver schickt die Webseite (HTML-Datei) an dein Gerät zurück.",
+    "Der Browser zeigt die Webseite an."
+  ];
+
+  const dnsPool     = document.getElementById("dnsPool");
+  const dnsOrder    = document.getElementById("dnsOrder");
+  const dnsCheck    = document.getElementById("dnsCheck");
+  const dnsReset    = document.getElementById("dnsReset");
+  const dnsFeedback = document.getElementById("dnsFeedback");
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function dnsRender() {
+    dnsPool.innerHTML = "";
+    dnsOrder.innerHTML = "";
+    dnsFeedback.className = "feedback";
+    dnsFeedback.textContent = "";
+    shuffle(dnsSteps).forEach(function (text) {
+      const el = document.createElement("div");
+      el.className = "step-card";
+      el.textContent = text;
+      el.addEventListener("click", function () {
+        if (el.classList.contains("chosen")) return;
+        el.classList.add("chosen");
+        const li = document.createElement("li");
+        li.textContent = text;
+        li.addEventListener("click", function () {
+          li.remove();
+          el.classList.remove("chosen");
+          dnsFeedback.className = "feedback";
+          dnsFeedback.textContent = "";
+        });
+        dnsOrder.appendChild(li);
+      });
+      dnsPool.appendChild(el);
+    });
+  }
+
+  dnsCheck.addEventListener("click", function () {
+    const items = dnsOrder.querySelectorAll("li");
+    if (items.length !== dnsSteps.length) {
+      dnsFeedback.className = "feedback show bad";
+      dnsFeedback.innerHTML = "<strong>Fast!</strong> Bitte ordne zuerst alle " + dnsSteps.length +
+        " Schritte – aktuell sind es nur " + items.length + ".";
+      return;
+    }
+    let ok = 0;
+    items.forEach(function (li, i) {
+      li.classList.remove("correct", "wrong");
+      if (li.textContent === dnsSteps[i]) { li.classList.add("correct"); ok++; }
+      else { li.classList.add("wrong"); }
+    });
+    dnsFeedback.className = "feedback show " + (ok === dnsSteps.length ? "good" : "bad");
+    dnsFeedback.innerHTML = ok === dnsSteps.length
+      ? "<strong>🎉 Perfekt!</strong> Der Ablauf stimmt – so ruft dein Browser eine Webseite ab."
+      : "<strong>Noch nicht ganz.</strong> " + ok + " von " + dnsSteps.length +
+        " Schritten sitzen an der richtigen Stelle. Schau nochmal genau hin!";
+  });
+
+  dnsReset.addEventListener("click", dnsRender);
+  dnsRender();
+
+  /* ---------- HTML-Live-Editor ---------- */
+  var starterHtml = [
+    "<h1>Hallo Welt!</h1>",
+    "<p>Das ist meine erste eigene Webseite.</p>",
+    "<p>Hier ist ein Link: <a href='https://www.ard.de'>Zur ARD</a></p>",
+    "<p>Und hier ein Bild:</p>",
+    "<img src='https://picsum.photos/300/150' alt='Zufallsbild'>"
+  ].join("\n");
+
+  var snippets = {
+    h1: "<h1>Eine neue Ueberschrift</h1>",
+    p: "<p>Ein neuer Absatz mit Text.</p>",
+    a: "<a href='https://de.wikipedia.org'>Zur Wikipedia</a>",
+    img: "<img src='https://picsum.photos/200/100?random=2' alt='Noch ein Bild'>"
+  };
+
+  var htmlCode = document.getElementById("htmlCode");
+  var htmlPreview = document.getElementById("htmlPreview");
+
+  function updatePreview() {
+    htmlPreview.srcdoc = "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
+      "<style>body{font-family:sans-serif;padding:12px;line-height:1.5;color:#2c3e50;}a{color:#2f6cb3;}</style>" +
+      "</head><body>" + htmlCode.value + "</body></html>";
+  }
+
+  htmlCode.value = starterHtml;
+  htmlCode.addEventListener("input", updatePreview);
+  updatePreview();
+
+  document.querySelectorAll(".snippet-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var s = btn.dataset.snippet;
+      if (s === "reset") { htmlCode.value = starterHtml; }
+      else { htmlCode.value += "\n" + snippets[s]; }
+      updatePreview();
+      htmlCode.focus();
+    });
+  });
+
+  /* ---------- Kopier-Buttons für die Code-Beispiele ---------- */
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = document.getElementById(btn.dataset.copy === "html" ? "codeHtml" : "codeCss");
+      var text = pre.textContent;
+      var done = function () {
+        btn.textContent = "✅ Kopiert!";
+        setTimeout(function () { btn.textContent = "📋 Kopieren"; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  naechsteAufgabe();
+})();
+</script>
+</body>
+</html>
