@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadratische Gleichungen – Vorbereitung auf die Lösungsformel</title>
+<script defer src="https://cdn.jsdelivr.net/npm/mathlive@0.111.4"></script>
+<script type="module">
+    import { ComputeEngine } from
+      "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@0.192.0/+esm";
+
+    window.MathAnswerComputeEngine = new ComputeEngine();
+
+    await customElements.whenDefined('math-field');
+
+    document.querySelectorAll('math-field').forEach(mf => {
+      mf.removeAttribute('math-virtual-keyboard-policy');
+      mf.mathVirtualKeyboardPolicy = 'sandboxed';
+    });
+</script>
+
+<style>
+  /* =====================================================
+     MATHEMATIK-LABOR
+     Editorial design – warm, precise, contemporary
+     Funktionalität und bestehende Selektoren bleiben erhalten
+     ===================================================== */
+
+  :root {
+    --g: #245B63;
+    --gl: #E5F0EF;
+    --gd: #183F49;
+
+    --ink: #202D35;
+    --mut: #75818A;
+    --bg: #F5F3ED;
+
+    --ok: #28745B;
+    --okbg: #E9F3ED;
+
+    --bad: #B64E43;
+    --badbg: #FAECE8;
+
+    --info: #476C88;
+    --infobg: #EDF3F7;
+
+    --line: #E4E2DA;
+
+    --copper: #C18454;
+    --paper: #FFFEFA;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Kopfbereich ---------- */
+
+  header {
+    position: relative;
+    overflow: hidden;
+    background: var(--gd);
+    color: #fff;
+    padding: 30px 24px 28px;
+    border-bottom: 4px solid var(--copper);
+  }
+
+  header::after {
+    content: "∑";
+    position: absolute;
+    right: max(5%, calc((100% - 860px) / 2));
+    top: -35px;
+    font-family: Georgia, serif;
+    font-size: 160px;
+    line-height: 1;
+    color: rgba(255,255,255,.055);
+    pointer-events: none;
+  }
+
+  header h1 {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto 5px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(27px, 4vw, 34px);
+    font-weight: 500;
+    letter-spacing: -.6px;
+    line-height: 1.2;
+  }
+
+  header p {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    color: #D4E3E3;
+    font-size: 15px;
+    letter-spacing: .2px;
+  }
+
+  /* ---------- Hauptbereich ---------- */
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 18px 90px;
+  }
+
+  /* ---------- Seitenfortschritt ---------- */
+
+  .lernfortschritt {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin: 0 0 16px;
+    padding: 7px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255, 254, 250, .96);
+    box-shadow: 0 3px 12px rgba(34, 48, 52, .06);
+  }
+
+  .lernfortschritt button {
+    min-height: 44px;
+    padding: 7px 5px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--mut);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .lernfortschritt button:hover {
+    background: var(--gl);
+    color: var(--gd);
+    box-shadow: none;
+  }
+
+  .lernfortschritt button[aria-selected="true"] {
+    background: var(--gd);
+    border-color: var(--gd);
+    color: #fff;
+  }
+
+  .seiten-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 15px;
+    border-top: 1px solid var(--line);
+  }
+
+  .seiten-nav button {
+    min-width: 118px;
+  }
+
+  .seiten-nav button:only-child {
+    margin-left: auto;
+  }
+
+  section.card {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 0 0 22px;
+    box-shadow: 0 3px 12px rgba(34, 48, 52, .035);
+  }
+
+  h2 {
+    margin: 0 0 16px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid var(--line);
+    color: var(--gd);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 23px;
+    font-weight: 500;
+    letter-spacing: -.3px;
+  }
+
+  h3 {
+    margin: 22px 0 8px;
+    color: var(--g);
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  /* ---------- Tabellen ---------- */
+
+  table.merk {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0 18px;
+    font-size: 15px;
+    overflow: hidden;
+    border-radius: 7px;
+  }
+
+  table.merk th,
+  table.merk td {
+    border: 1px solid var(--line);
+    padding: 9px 11px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  table.merk th {
+    background: var(--gl);
+    color: var(--gd);
+    font-weight: 800;
+  }
+
+  table.merk tr:nth-child(even) td {
+    background: #FAFAF6;
+  }
+
+  /* ---------- Beschriftungen ---------- */
+
+  label {
+    display: block;
+    margin: 8px 0;
+    color: var(--ink);
+  }
+
+  math {
+    font-size: 1.08em;
+  }
+
+  /* ---------- Formeleingabe ---------- */
+
+  math-field.math-eingabe {
+    display: block;
+    width: min(100%, 32em);
+    min-height: 3.2em;
+    margin: 12px 0;
+    padding: 10px 13px;
+    border: 1.5px solid #C9D5D2;
+    border-radius: 8px;
+    background: #FCFDFB;
+    font-size: 1.15em;
+    transition: border-color .18s, box-shadow .18s;
+  }
+
+  math-field.math-eingabe:focus-within {
+    border-color: var(--g);
+    box-shadow: 0 0 0 3px rgba(36, 91, 99, .12);
+    outline: none;
+  }
+
+  .loesungsanzahl {
+    margin: 14px 0 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .loesungsanzahl legend {
+    padding: 0 5px;
+    color: var(--gd);
+    font-weight: 700;
+  }
+
+  .antwortfelder[hidden],
+  .antwortfeld[hidden] {
+    display: none;
+  }
+
+  /* ---------- Eingabefelder ---------- */
+
+  input[type=text],
+  select,
+  textarea {
+    font: inherit;
+    color: var(--ink);
+    background: #FCFDFB;
+    padding: 9px 12px;
+    border: 1.5px solid #D9DFDC;
+    border-radius: 7px;
+    min-height: 44px;
+    transition: border-color .18s, box-shadow .18s;
+  }
+
+  input[type=text]:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--g);
+    box-shadow: 0 0 0 3px rgba(36, 91, 99, .10);
+  }
+
+  input[type=text] {
+    width: 9em;
+  }
+
+  input[type=text].lang {
+    width: 100%;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 70px;
+    resize: vertical;
+  }
+
+  select {
+    min-width: 12em;
+    cursor: pointer;
+  }
+
+  /* ---------- Rückmeldungen ---------- */
+
+  input.ok,
+  select.ok,
+  math-field.ok,
+  .ok > input[type=radio] {
+    outline: 3px solid var(--ok);
+    outline-offset: 1px;
+  }
+
+  input.falsch,
+  select.falsch,
+  math-field.falsch {
+    outline: 3px solid var(--bad);
+    outline-offset: 1px;
+  }
+
+  [data-radiogruppe] {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 7px;
+  }
+
+  [data-radiogruppe].ok {
+    background: var(--okbg);
+  }
+
+  [data-radiogruppe].falsch {
+    background: var(--badbg);
+  }
+
+  [data-radiogruppe] label {
+    display: inline-block;
+    margin: 0 14px 0 0;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  /* ---------- Aufgaben ---------- */
+
+  .aufgabe {
+    border-top: 1px solid var(--line);
+    padding: 17px 0;
+  }
+
+  .aufgabe:first-child {
+    border-top: 0;
+  }
+
+  .fb {
+    margin: 10px 0 0;
+    padding: 10px 14px;
+    border-radius: 7px;
+    font-size: 15px;
+    border-left: 3px solid transparent;
+  }
+
+  .fb.ok {
+    background: var(--okbg);
+    color: var(--gd);
+    border-left-color: var(--ok);
+  }
+
+  .fb.falsch {
+    background: var(--badbg);
+    color: var(--bad);
+    border-left-color: var(--bad);
+  }
+
+  .fb.leer {
+    background: var(--infobg);
+    color: #34566C;
+    border-left-color: var(--info);
+  }
+
+  /* ---------- Hilfen und Lösungen ---------- */
+
+  details {
+    margin: 10px 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 13px;
+    background: #FAFAF6;
+    transition: background .18s;
+  }
+
+  details[open] {
+    background: #F7F8F4;
+  }
+
+  details.hilfe summary {
+    color: var(--info);
+    cursor: pointer;
+    min-height: 44px;
+    line-height: 32px;
+    font-weight: 700;
+  }
+
+  details.loesung {
+    background: var(--okbg);
+    border-color: #D2E6D8;
+  }
+
+  details.loesung summary {
+    color: var(--gd);
+    cursor: pointer;
+    min-height: 44px;
+    line-height: 32px;
+    font-weight: 800;
+  }
+
+  details ol {
+    margin: 8px 0 5px 22px;
+    padding-left: 8px;
+  }
+
+  /* ---------- Schaltflächen ---------- */
+
+  button {
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: .15px;
+    background: var(--g);
+    color: #fff;
+    border: 1px solid var(--g);
+    border-radius: 7px;
+    padding: 11px 19px;
+    min-height: 46px;
+    cursor: pointer;
+    transition: background .18s, transform .15s, box-shadow .18s;
+  }
+
+  button:hover {
+    background: var(--gd);
+    border-color: var(--gd);
+    box-shadow: 0 3px 9px rgba(24, 63, 73, .16);
+  }
+
+  button:active {
+    transform: translateY(1px);
+  }
+
+  button:focus-visible {
+    outline: 3px solid var(--copper);
+    outline-offset: 3px;
+  }
+
+  button.sekundaer {
+    background: transparent;
+    color: var(--gd);
+    border: 1.5px solid var(--g);
+  }
+
+  button.sekundaer:hover {
+    background: var(--gl);
+    box-shadow: none;
+  }
+
+  /* ---------- Punkte und Hinweise ---------- */
+
+  .punkte {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .punkte input {
+    width: 5em;
+    font-weight: 800;
+    background: #F0F1EC;
+  }
+
+  .hinweis {
+    background: var(--infobg);
+    border-radius: 7px;
+    border-left: 3px solid var(--info);
+    padding: 11px 14px;
+    font-size: 15px;
+    margin: 12px 0;
+    color: #34566C;
+  }
+
+  .stern {
+    color: #AD733D;
+    font-weight: 900;
+  }
+
+  /* ---------- Druckschaltfläche ---------- */
+
+  #btnPrint {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    font-size: 14px;
+    opacity: .95;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .16);
+    z-index: 100;
+  }
+
+  /* ---------- Responsive Darstellung ---------- */
+
+  @media (max-width: 600px) {
+    body {
+      font-size: 16px;
+    }
+
+    header {
+      padding: 23px 18px;
+    }
+
+    header::after {
+      right: -8px;
+      font-size: 120px;
+    }
+
+    main {
+      padding: 17px 12px 85px;
+    }
+
+    section.card {
+      padding: 17px;
+      margin-bottom: 15px;
+      border-radius: 9px;
+    }
+
+    h2 {
+      font-size: 21px;
+    }
+
+    table.merk {
+      font-size: 14px;
+    }
+
+    table.merk th,
+    table.merk td {
+      padding: 7px;
+    }
+
+    #btnPrint {
+      right: 12px;
+      bottom: 12px;
+    }
+
+    .lernfortschritt {
+      top: 4px;
+      gap: 3px;
+      padding: 5px;
+    }
+
+    .lernfortschritt button {
+      min-height: 48px;
+      font-size: 11px;
+    }
+
+    .seiten-nav button {
+      min-width: 100px;
+      width: 48%;
+      padding-inline: 8px;
+    }
+  }
+
+  /* ---------- Drucklayout ---------- */
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  @media print {
+    body {
+      background: #fff;
+      color: #000;
+      font-size: 12pt;
+    }
+
+    header {
+      background: #fff;
+      color: #000;
+      border-bottom: 2px solid #000;
+      padding: 12px 0;
+    }
+
+    header::after {
+      display: none;
+    }
+
+    header p {
+      color: #444;
+    }
+
+    #btnPrint,
+    .lernfortschritt,
+    .seiten-nav,
+    button,
+    [data-pruefen] {
+      display: none;
+    }
+
+    main {
+      padding: 12px 0;
+    }
+
+    section.card[data-seite][hidden] {
+      display: block !important;
+    }
+
+    section.card {
+      break-inside: avoid;
+      border: 1px solid #999;
+      box-shadow: none;
+      background: #fff;
+    }
+
+    input,
+    select,
+    textarea,
+    math-field {
+      border: 1px solid #333;
+    }
+
+    details {
+      border: 1px solid #999;
+      background: #fff;
+    }
+
+    details.loesung {
+      display: none;
+    }
+
+    .fb {
+      break-inside: avoid;
+    }
+  }
+</style>
+
+</head>
+<body>
+<header>
+  <h1>Quadratische Gleichungen</h1>
+  <p>Klasse 9 · Bitte der Reihe nach durcharbeiten · <span data-fortschritt>0 von 2 Themen geprüft</span></p>
+</header>
+<main>
+  <nav class="lernfortschritt" role="tablist" aria-label="Fortschritt im Arbeitsblatt">
+    <button type="button" id="tab-thema-1" role="tab" aria-controls="seite-thema-1" aria-selected="true" data-seite-ziel="0">1 · Einfache Gleichungen</button>
+    <button type="button" id="tab-thema-2" role="tab" aria-controls="seite-thema-2" aria-selected="false" data-seite-ziel="1">2 · Quadratische Ergänzung</button>
+  </nav>
+
+<!-- ============ THEMA 1 ============ -->
+<section class="card" id="seite-thema-1" data-seite data-thema="1">
+  <h2>Schritt 1: Gleichungen in Scheitelpunktform lösen</h2>
+  <p>Wir starten mit Gleichungen, bei denen das Quadrat bereits allein steht. Löse erst die Quadratwurzel und achte darauf, dass es zu einer positiven Zahl zwei Lösungen gibt.</p>
+  <table class="merk">
+    <tr><th>Gleichung</th><th>So gehst du vor</th><th>Lösung</th></tr>
+    <tr><td><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>25</mn><mo>=</mo><mn>0</mn></math></td><td><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>=</mo><mn>25</mn></math><br><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>±</mo><msqrt><mn>25</mn></msqrt></math></td><td><b><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>−</mo><mn>5</mn></math> oder <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>5</mn></math></b></td></tr>
+    <tr><td><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>−</mo><mn>4</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>9</mn></math></td><td><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>−</mo><mn>4</mn><mo>=</mo><mo>±</mo><mn>3</mn></math></td><td><b><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>1</mn></math> oder <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>7</mn></math></b></td></tr>
+  </table>
+  <p class="hinweis">Merke: Aus <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>u</mi><mn>2</mn></msup><mo>=</mo><mi>k</mi></math> folgt bei <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>k</mi><mo>&gt;</mo><mn>0</mn></math>: <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>u</mi><mo>=</mo><mo>±</mo><msqrt><mi>k</mi></msqrt></math>. Vergiss nicht, anschließend nach <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math> aufzulösen. Notiere deine Rechenschritte im Heft.</p>
+
+  <div class="aufgabe">
+    <h3>Aufgabe 1: Löse die Gleichungen.</h3>
+    <p>Wähle zuerst, wie viele reelle Lösungen die Gleichung hat. Danach erscheinen entsprechend viele Eingabefelder.</p>
+    <p> Wenn es zwei Nullstellen gibt, ist  <math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>x</mi><mn>1</mn></msub></math> immer die kleinere und <math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>x</mi><mn>2</mn></msub></math> die größere Nullstelle.</p>
+    <div class="aufgabe-antwort">
+      <p>a) <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>25</mn><mo>=</mo><mn>0</mn></math></p>
+      <fieldset class="loesungsanzahl">
+        <legend>Wie viele reelle Lösungen hat die Gleichung?</legend>
+        <div data-radiogruppe>
+          <label><input type="radio" name="s1_a1_a_anzahl" value="0" data-track="s1_a1_a_anzahl"> keine</label>
+          <label><input type="radio" name="s1_a1_a_anzahl" value="1" data-track="s1_a1_a_anzahl"> eine</label>
+          <label><input type="radio" name="s1_a1_a_anzahl" value="2" data-track="s1_a1_a_anzahl"> zwei</label>
+        </div>
+      </fieldset>
+      <div class="antwortfelder" data-antwort-container="s1_a1_a_anzahl" hidden>
+        <div class="antwortfeld" data-antwortfeld hidden>
+          <math-field class="math-eingabe"  data-track="s1_a1_a" math-virtual-keyboard-policy="sandboxed" aria-label="Kleinere Lösung der Gleichung x² − 25 = 0">x_1=\placeholder[first]{}</math-field>
+        </div>
+        <div class="antwortfeld" data-antwortfeld hidden>
+          <math-field class="math-eingabe"  data-track="s1_a1_b" math-virtual-keyboard-policy="sandboxed" aria-label="Größere Lösung der Gleichung x² − 25 = 0">x_2=\placeholder[second]{}</math-field>
+        </div>
+      </div>
+    </div>
+    <div class="aufgabe-antwort">
+      <p>b) <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>−</mo><mn>4</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>8</mn></math> <span>(exakte Form)</span></p>
+      <fieldset class="loesungsanzahl">
+        <legend>Wie viele reelle Lösungen hat die Gleichung?</legend>
+        <div data-radiogruppe>
+          <label><input type="radio" name="s1_a1_c_anzahl" value="0" data-track="s1_a1_c_anzahl"> keine</label>
+          <label><input type="radio" name="s1_a1_c_anzahl" value="1" data-track="s1_a1_c_anzahl"> eine</label>
+          <label><input type="radio" name="s1_a1_c_anzahl" value="2" data-track="s1_a1_c_anzahl"> zwei</label>
+        </div>
+      </fieldset>
+      <div class="antwortfelder" data-antwort-container="s1_a1_c_anzahl" hidden>
+        <div class="antwortfeld" data-antwortfeld hidden>
+          <math-field class="math-eingabe" readonly data-track="s1_a1_c" math-virtual-keyboard-policy="sandboxed" aria-label="Kleinere Lösung der Gleichung (x − 4)² = 8">x_1=\placeholder[first]{}</math-field>
+        </div>
+        <div class="antwortfeld" data-antwortfeld hidden>
+          <math-field class="math-eingabe" readonly data-track="s1_a1_d" math-virtual-keyboard-policy="sandboxed" aria-label="Größere Lösung der Gleichung (x − 4)² = 8">x_2=\placeholder[second]{}</math-field>
+        </div>
+      </div>
+    </div>
+    <p class="hinweis" id="mathlive-fehler" hidden>Die Formeleingabe konnte nicht geladen werden. Bitte prüfe die Internetverbindung und lade das Arbeitsblatt erneut.</p>
+    <details class="hilfe" data-hilfe="s1_a1_1"><summary>💡 Hilfe 1 – Strategie</summary><div class="inhalt">Bringe zuerst das Quadrat allein auf eine Seite. Ziehe dann die Quadratwurzel. Bei einer positiven rechten Seite gibt es eine positive und eine negative Wurzel.</div></details>
+    <details class="hilfe" data-hilfe="s1_a1_2"><summary>💡 Hilfe 2 – konkreter Hinweis</summary><div class="inhalt">Bei b) gilt <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>−</mo><mn>4</mn><mo>=</mo><mo>±</mo><msqrt><mn>8</mn></msqrt></math>. Löse beide Gleichungen nach <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math> auf und trage die Lösungen mit Wurzel ein.</div></details>
+    <div class="fb" data-feedback="s1_a1" hidden></div>
+    <details class="loesung" data-loesung="s1_a1"><summary>Musterlösung Aufgabe 1</summary>
+      <ol><li>a) <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>=</mo><mn>25</mn></math>, also <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>±</mo><mn>5</mn></math>. Lösungen: <b>−5 und 5</b>.</li><li>b) <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>−</mo><mn>4</mn><mo>=</mo><mo>±</mo><msqrt><mn>8</mn></msqrt></math>, also <b><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mn>4</mn><mo>−</mo><msqrt><mn>8</mn></msqrt></math></b> und <b><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>4</mn><mo>+</mo><msqrt><mn>8</mn></msqrt></math></b>.</li></ol>
+      <p>Typischer Fehler: nur die positive Quadratwurzel zu berücksichtigen. Prüfe bei einer positiven rechten Seite immer beide Vorzeichen.</p>
+    </details>
+  </div>
+
+  <div class="aufgabe">
+    <h3>Aufgabe 2: Wähle den richtigen nächsten Schritt.</h3>
+    <p>Du löst <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>9</mn></math>. Welche Gleichung entsteht direkt nach dem Wurzelziehen?</p>
+    <div data-radiogruppe>
+      <label><input type="radio" name="s1_a2" value="a" data-track="s1_a2"> <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>2</mn><mo>=</mo><mn>3</mn></math></label>
+      <label><input type="radio" name="s1_a2" value="b" data-track="s1_a2"> <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>2</mn><mo>=</mo><mo>±</mo><mn>3</mn></math></label>
+      <label><input type="radio" name="s1_a2" value="c" data-track="s1_a2"> <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>±</mo><mn>9</mn></math></label>
+    </div>
+    <details class="hilfe" data-hilfe="s1_a2_1"><summary>💡 Hilfe 1 – Strategie</summary><div class="inhalt">Welche beiden Zahlen haben beim Quadrieren den Wert 9?</div></details>
+    <details class="hilfe" data-hilfe="s1_a2_2"><summary>💡 Hilfe 2 – konkreter Hinweis</summary><div class="inhalt">Sowohl 3 als auch −3 haben das Quadrat 9. Das ± gehört deshalb vor die Wurzel.</div></details>
+    <div class="fb" data-feedback="s1_a2" hidden></div>
+    <details class="loesung" data-loesung="s1_a2"><summary>Musterlösung Aufgabe 2</summary>
+      <p>Richtig ist <b><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>2</mn><mo>=</mo><mo>±</mo><mn>3</mn></math></b>. Daraus folgen <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>1</mn></math> oder <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>−</mo><mn>5</mn></math>.</p>
+    </details>
+  </div>
+
+  <div class="aufgabe">
+    <h3><span class="stern">★</span> Aufgabe 3 (Erweiterung, zählt nicht als Punkt): Sonderfall</h3>
+    <label>Wie viele reelle Lösungen hat <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mo>−</mo><mn>4</mn></math>? <select data-track="s1_stern"><option value="">– bitte wählen –</option><option value="0">keine</option><option value="1">eine</option><option value="2">zwei</option></select></label>
+    <div class="fb" data-feedback="s1_stern" hidden></div>
+    <details class="loesung" data-loesung="s1_stern"><summary>Musterlösung ★</summary>
+      <p>Das Quadrat einer reellen Zahl kann nicht negativ sein. Daher hat die Gleichung <b>keine reelle Lösung</b>.</p>
+    </details>
+  </div>
+
+  <div class="punkte">
+    <button type="button" data-pruefen="1">Thema 1 prüfen</button>
+    <label>Punkte: <input type="number" readonly data-track="s1_punkte" data-track-type="punkte" data-max="2"></label>
+    <span data-summe="1"></span>
+  </div>
+</section>
+
+<!-- ============ THEMA 2 ============ -->
+<section class="card" id="seite-thema-2" data-seite data-thema="2">
+  <h2>Schritt 2: Quadratische Ergänzung bei <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi></math></h2>
+  <p>Nicht jede Gleichung hat bereits die "schöne" Form wie in Teil 1. Mit der quadratischen Ergänzung formen wir die linke Seite zu einem Binom um.</p>
+  <table class="merk">
+    <tr><th>Schritt</th><th>Beispiel: <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>5</mn><mo>=</mo><mn>0</mn></math></th></tr>
+    <tr><td>1. Hälfte des <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math>-Koeffizienten bestimmen</td><td>Die Hälfte von 6 ist 3.</td></tr>
+    <tr><td>2. Hälfte quadrieren und auf beiden Seiten ergänzen</td><td><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn mathvariant="bold">9</mn><mo>=</mo><mo>−</mo><mn>5</mn><mo>+</mo><mn>9</mn></math></td></tr>
+    <tr><td>3. Linke Seite als Binom schreiben und wie gewohnt lösen</td><td><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>4</mn></math><br><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>3</mn><mo>=</mo><mo>±</mo><mn>2</mn></math><br><b><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>−</mo><mn>1</mn></math> oder <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mo>−</mo><mn>5</mn></math></b></td></tr>
+  </table>
+  <p class="hinweis">Merke: Bei <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>x</mi></math> ergänzt du um <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mfrac><mi>b</mi><mn>2</mn></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math>. Die Zahl muss auf beiden Seiten der Gleichung ergänzt werden, damit die Gleichung gleichwertig bleibt. Hier wird weiterhin mit <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>a</mi><mo>=</mo><mn>1</mn></math> gearbeitet.</p>
+
+  <div class="aufgabe">
+    <h3>Aufgabe 1: Ergänze zum Binom und löse.</h3>
+    <label>a) Bei <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>10</mn><mi>x</mi><mo>+</mo><mn>13</mn><mo>=</mo><mn>0</mn></math>: Welche Zahl ergänzt du auf beiden Seiten? <input type="text" inputmode="decimal" data-track="s2_a1_a" maxlength="10" autocomplete="off"></label>
+    <p>b) Ergänze die Gleichungskette. Trage die Ergänzungszahl und beide Lösungen in die Lücken ein:</p>
+    <math-field class="math-eingabe" readonly data-track="s2_a1_b" data-secondary-track="s2_a1_c" data-tertiary-track="s2_a1_d" math-virtual-keyboard-policy="sandboxed" aria-label="Ergänze die Gleichungskette für x² − 4x − 5 = 0">\begin{aligned}x^2-4x-5&=0\\x^2-4x&=5\quad\big|+\placeholder[added]{}\\(x-2)^2&=9\\x-2&=\pm3\\x_1&=\placeholder[first]{},\quad x_2=\placeholder[second]{}\end{aligned}</math-field>
+    <details class="hilfe" data-hilfe="s2_a1_1"><summary>💡 Hilfe 1 – Strategie</summary><div class="inhalt">Nimm die Hälfte des Koeffizienten vor <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math> und quadriere sie. Danach schreibe die linke Seite als Binom und ziehe die Wurzel.</div></details>
+    <details class="hilfe" data-hilfe="s2_a1_2"><summary>💡 Hilfe 2 – konkreter Hinweis</summary><div class="inhalt">Bei a) ist die Hälfte von 10 gleich 5. Bei b) ist die Hälfte von −4 gleich −2. Quadriere jeweils diese Hälfte.</div></details>
+    <div class="fb" data-feedback="s2_a1" hidden></div>
+    <details class="loesung" data-loesung="s2_a1"><summary>Musterlösung Aufgabe 1</summary>
+      <ol><li>a) <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mfrac><mn>10</mn><mn>2</mn></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>25</mn></math>. Ergänzt: <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>10</mn><mi>x</mi><mo>+</mo><mn>25</mn><mo>=</mo><mn>12</mn></math>, also <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>12</mn></math>.</li><li>b) <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mfrac><mrow><mo>−</mo><mn>4</mn></mrow><mn>2</mn></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn mathvariant="bold">4</mn></math>.</li><li>c) <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>4</mn><mo>=</mo><mn>9</mn></math>, also <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>−</mo><mn>2</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>9</mn></math>. Daher <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>−</mo><mn>2</mn><mo>=</mo><mo>±</mo><mn>3</mn></math> und <b><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>x</mi><mn>1</mn></msub><mo>=</mo><mo>−</mo><mn>1</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>5</mn></math></b>.</li></ol>
+    </details>
+  </div>
+
+  <div class="aufgabe">
+    <h3>Aufgabe 2: Welche quadratische Ergänzung ist richtig?</h3>
+    <p>Für <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>5</mn><mo>=</mo><mn>0</mn></math> erhältst du nach der quadratischen Ergänzung:</p>
+    <div data-radiogruppe>
+      <label><input type="radio" name="s2_a2" value="a" data-track="s2_a2"> <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>6</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>31</mn></math></label>
+      <label><input type="radio" name="s2_a2" value="b" data-track="s2_a2"> <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>4</mn></math></label>
+      <label><input type="radio" name="s2_a2" value="c" data-track="s2_a2"> <math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>14</mn></math></label>
+    </div>
+    <details class="hilfe" data-hilfe="s2_a2_1"><summary>💡 Hilfe 1 – Strategie</summary><div class="inhalt">Halbiere den Koeffizienten von <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math>, ergänze dessen Quadrat auf beiden Seiten und fasse die linke Seite als Binom zusammen.</div></details>
+    <details class="hilfe" data-hilfe="s2_a2_2"><summary>💡 Hilfe 2 – konkreter Hinweis</summary><div class="inhalt">Die Hälfte von 6 ist 3; 3 zum Quadrat ist 9. Rechts steht dann −5 + 9.</div></details>
+    <div class="fb" data-feedback="s2_a2" hidden></div>
+    <details class="loesung" data-loesung="s2_a2"><summary>Musterlösung Aufgabe 2</summary>
+      <p>Richtig ist <b><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>4</mn></math></b>: Zur linken Seite kommt 9 dazu, also muss auch rechts 9 ergänzt werden: <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>−</mo><mn>5</mn><mo>+</mo><mn>9</mn><mo>=</mo><mn>4</mn></math>.</p>
+    </details>
+  </div>
+
+  <div class="punkte">
+    <button type="button" data-pruefen="2">Thema 2 prüfen</button>
+    <label>Punkte: <input type="number" readonly data-track="s2_punkte" data-track-type="punkte" data-max="2"></label>
+    <span data-summe="2"></span>
+  </div>
+</section>
+
+</main>
+<button id="btnPrint" type="button" class="sekundaer" onclick="window.print()">PDF/Drucken (A4)</button>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var seiten = Array.prototype.slice.call(document.querySelectorAll("main > section[data-seite]"));
+    var tabs = Array.prototype.slice.call(document.querySelectorAll(".lernfortschritt [data-seite-ziel]"));
+
+    function zeigeSeite(index, aktiviereFokus, scrollNachOben) {
+      if (index < 0 || index >= seiten.length) return;
+      seiten.forEach(function (seite, i) {
+        seite.hidden = i !== index;
+        seite.setAttribute("role", "tabpanel");
+        seite.setAttribute("aria-labelledby", tabs[i].id);
+      });
+      tabs.forEach(function (tab, i) {
+        tab.setAttribute("aria-selected", i === index ? "true" : "false");
+        tab.setAttribute("tabindex", i === index ? "0" : "-1");
+      });
+      if (aktiviereFokus) tabs[index].focus();
+      try { history.replaceState(null, "", "#" + seiten[index].id); } catch (e) {}
+      var nav = document.querySelector(".lernfortschritt");
+      if (scrollNachOben && nav) nav.scrollIntoView({ block: "start" });
+    }
+
+    seiten.forEach(function (seite, index) {
+      var nav = document.createElement("div");
+      nav.className = "seiten-nav";
+      if (index > 0) {
+        var zurueck = document.createElement("button");
+        zurueck.type = "button";
+        zurueck.className = "sekundaer";
+        zurueck.textContent = "← Zurück";
+        zurueck.addEventListener("click", function () { zeigeSeite(index - 1, false, true); });
+        nav.appendChild(zurueck);
+      }
+      if (index < seiten.length - 1) {
+        var weiter = document.createElement("button");
+        weiter.type = "button";
+        weiter.textContent = "Weiter →";
+        weiter.addEventListener("click", function () { zeigeSeite(index + 1, false, true); });
+        nav.appendChild(weiter);
+      }
+      seite.appendChild(nav);
+    });
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        zeigeSeite(Number(tab.getAttribute("data-seite-ziel")), false, true);
+      });
+      tab.addEventListener("keydown", function (event) {
+        var index = Number(tab.getAttribute("data-seite-ziel"));
+        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+          event.preventDefault();
+          var richtung = event.key === "ArrowRight" ? 1 : -1;
+          zeigeSeite(Math.max(0, Math.min(seiten.length - 1, index + richtung)), true, true);
+        }
+      });
+    });
+
+    var start = seiten.findIndex(function (seite) {
+      return "#" + seite.id === location.hash;
+    });
+    zeigeSeite(start >= 0 ? start : 0, false);
+
+    var felder = document.querySelectorAll("math-field.math-eingabe");
+    if (!window.mathVirtualKeyboard || !window.MathfieldElement || !window.MathAnswerComputeEngine) {
+      document.getElementById("mathlive-fehler").hidden = false;
+    } else {
+      for (var i = 0; i < felder.length; i++) {
+        felder[i].addEventListener("focusin", function () {
+          window.mathVirtualKeyboard.layouts = {
+            label: "Grundrechenarten",
+            rows: [
+              ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]", "[7]", "[8]", "[9]", "[0]"],
+              ["+", "-", "\\cdot", "/", "(", ")", "\\sqrt{#?}", "#@^{#?}"],
+              ["[left]", "[right]", "[backspace]"]
+            ]
+          };
+          window.mathVirtualKeyboard.show();
+        });
+      }
+      var tastaturBereich = null;
+      window.mathVirtualKeyboard.addEventListener("geometrychange", function (event) {
+        tastaturBereich = event.detail.boundingRect;
+      });
+      
+      document.addEventListener("keydown", function (event) {
+        if (event.key !== "Escape") return;
+        var pfad = event.composedPath ? event.composedPath() : [event.target];
+        var ausMatheFeld = pfad.some(function (element) {
+          return element && element.matches && element.matches("math-field.math-eingabe");
+        });
+        if (ausMatheFeld) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        window.mathVirtualKeyboard.hide();
+      }, true);
+    }
+
+    function aktualisiereAntwortfelder(gruppe) {
+      var ausgewaehlt = document.querySelector('input[name="' + gruppe + '"]:checked');
+      var container = document.querySelector('[data-antwort-container="' + gruppe + '"]');
+      if (!container) return;
+      var anzahl = ausgewaehlt ? Number(ausgewaehlt.value) : 0;
+      container.hidden = !ausgewaehlt;
+      container.querySelectorAll("[data-antwortfeld]").forEach(function (feld, index) {
+        feld.hidden = index >= anzahl;
+      });
+    }
+
+    var gruppen = document.querySelectorAll("[data-antwort-container]");
+    gruppen.forEach(function (container) {
+      var gruppe = container.getAttribute("data-antwort-container");
+      document.querySelectorAll('input[name="' + gruppe + '"]').forEach(function (radio) {
+        radio.addEventListener("change", function () { aktualisiereAntwortfelder(gruppe); });
+      });
+      aktualisiereAntwortfelder(gruppe);
+    });
+    window.addEventListener("load", function () {
+      window.setTimeout(function () {
+        gruppen.forEach(function (container) {
+          aktualisiereAntwortfelder(container.getAttribute("data-antwort-container"));
+        });
+      }, 0);
+    });
+  });
+</script>
+
+<!-- ============ KONFIGURATION (JSON, vom Assistenten geschrieben) ============ -->
+<!-- Optional: "tutor": true direkt nach "version" blendet an jeder Aufgabe den Knopf „Frage an den Tutor“ ein (nur mit Tutor im Fobizz-Klassenraum). -->
+<script type="application/json" id="ab-config">
+{
+  "version": 2,
+  "paket": "Quadratische Gleichungen: Vorbereitung auf die Lösungsformel",
+  "fach": "Mathematik",
+  "klasse": "9",
+  "erstellt": "2026-11-16",
+  "themen": [
+    {
+      "n": 1, "name": "Scheitelpunktform lösen",
+      "aufgaben": [
+        { "id": "s1_a1", "key": "a1", "label": "1: Gleichungen in Scheitelpunktform lösen", "stern": false,
+          "felder": [
+            { "id": "s1_a1_a_anzahl", "f": "x² − 25 = 0: Anzahl reeller Lösungen", "l": "zwei", "soll": "2", "typ": "radio",
+              "labels": { "0": "keine", "1": "eine", "2": "zwei" } },
+            { "id": "s1_a1_a", "f": "x² − 25 = 0: kleinere Lösung", "l": "−5", "soll": "-5", "typ": "math" },
+            { "id": "s1_a1_b", "f": "x² − 25 = 0: größere Lösung", "l": "5", "soll": "5", "typ": "math" },
+            { "id": "s1_a1_c_anzahl", "f": "(x − 4)² = 8: Anzahl reeller Lösungen", "l": "zwei", "soll": "2", "typ": "radio",
+              "labels": { "0": "keine", "1": "eine", "2": "zwei" } },
+            { "id": "s1_a1_c", "f": "(x − 4)² = 8: kleinere Lösung in exakter Form", "l": "4-\\sqrt{8}", "soll": "4-\\sqrt{8}", "typ": "math" },
+            { "id": "s1_a1_d", "f": "(x − 4)² = 8: größere Lösung in exakter Form", "l": "4+\\sqrt{8}", "soll": "4+\\sqrt{8}", "typ": "math" }
+          ] },
+        { "id": "s1_a2", "key": "a2", "label": "2: Vorzeichen beim Wurzelziehen", "stern": false,
+          "felder": [
+            { "id": "s1_a2", "f": "(x + 2)² = 9: Gleichung nach dem Wurzelziehen", "l": "x + 2 = ±3", "soll": "b", "typ": "radio",
+              "labels": { "a": "x + 2 = 3", "b": "x + 2 = ±3", "c": "x = ±9" } }
+          ] },
+        { "id": "s1_stern", "key": "stern", "label": "★: Negativer Wert auf der rechten Seite", "stern": true,
+          "felder": [
+            { "id": "s1_stern", "f": "(x + 1)² = −4: Anzahl reeller Lösungen", "l": "keine", "soll": "0", "typ": "auswahl",
+              "labels": { "0": "keine", "1": "eine", "2": "zwei" } }
+          ] }
+      ]
+    },
+    {
+      "n": 2, "name": "Quadratische Ergänzung",
+      "aufgaben": [
+        { "id": "s2_a1", "key": "a1", "label": "1: Quadratisch ergänzen und lösen", "stern": false,
+          "felder": [
+            { "id": "s2_a1_a", "f": "x² + 10x + 13 = 0: Ergänzungszahl", "l": "12", "soll": "12", "typ": "zahl" },
+            { "id": "s2_a1_b", "f": "x² − 4x − 5 = 0: Ergänzungszahl", "l": "4", "soll": "4", "typ": "math" },
+            { "id": "s2_a1_c", "f": "x² − 4x − 5 = 0: kleinere Lösung", "l": "−1", "soll": "-1", "typ": "math" },
+            { "id": "s2_a1_d", "f": "x² − 4x − 5 = 0: größere Lösung", "l": "5", "soll": "5", "typ": "math" }
+          ] },
+        { "id": "s2_a2", "key": "a2", "label": "2: Quadratische Ergänzung erkennen", "stern": false,
+          "felder": [
+            { "id": "s2_a2", "f": "x² + 6x + 5 = 0: Ergebnis der quadratischen Ergänzung", "l": "(x + 3)² = 4", "soll": "b", "typ": "radio",
+              "labels": { "a": "(x + 6)² = 31", "b": "(x + 3)² = 4", "c": "(x + 3)² = 14" } }
+          ] }
+      ]
+    }
+  ],
+  "felder": {}
+}
+</script>
+
+<!-- ============ AB-KERN (unverändert aus der Wissensdatei ab-kern.js) ============ -->
+<script>
+/* ============================================================
+   AB-KERN v2 (Fortbildung GymHIP) — Prüf- und Tracking-Kern
+   für interaktive HTML-Arbeitsblätter. Stand: AB-KERN v2.1
+   Diesen Block UNVERÄNDERT in jedes Arbeitsblatt einfügen
+   (als <script> vor </body>, VOR dem Abschluss-Button ist egal).
+   Er liest die Konfiguration aus <script type="application/json"
+   id="ab-config"> und übernimmt: Prüfen-Buttons, Feldmarkierung,
+   Feedback-Boxen, Punkte, Musterlösungs-Freischaltung, Hilfe-/
+   Musterlösungs-Tracking, Versuchszähler, Erstversuch, Erstfehler,
+   Wiederherstellung nach dem Laden. Läuft mit und ohne SCORM-Wrapper.
+   Neu in v2.1: Steht in ab-config auf oberster Ebene "tutor": true,
+   blendet der Kern an jeder Aufgabe den Knopf „Frage an den Tutor“
+   ein (kopiert Aufgabe und Eingaben für den Tutor im Fobizz-
+   Klassenraum in die Zwischenablage, zählt tutor_<aufgabe>).
+   ============================================================ */
+window.AB = (function () {
+  "use strict";
+  var cfg = null;          // geparste Konfiguration
+  var store = {};          // Fallback-Speicher ohne ScormTrack (Vorschau)
+
+  /* ---------- Tracking-Zugriff (immer über Guard) ---------- */
+  function T() { return window.ScormTrack || null; }
+  function tget(id) { var t = T(); return t ? t.get(id) : store[id]; }
+  function tset(id, v, typ) { var t = T(); if (t) t.set(id, v, typ); else store[id] = v; }
+
+  /* ---------- Hilfsfunktionen ---------- */
+  function q(sel) { return document.querySelector(sel); }
+  function qa(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+  function feldElement(id) {
+    return q('[data-track="' + id + '"]') ||
+      q('[data-secondary-track="' + id + '"]') ||
+      q('[data-tertiary-track="' + id + '"]');
+  }
+  function feldPrompt(el, id) {
+    if (typeof el.getPrompts !== "function") return null;
+    var trackingIds = [
+      el.getAttribute("data-track"),
+      el.getAttribute("data-secondary-track"),
+      el.getAttribute("data-tertiary-track")
+    ];
+    var index = trackingIds.indexOf(id);
+    var prompts = el.getPrompts();
+    return index >= 0 ? prompts[index] || null : null;
+  }
+  function norm(s) {
+    return String(s == null ? "" : s).trim().toLowerCase()
+      .replace(/\s+/g, " ").replace(/[.!?]+$/, "").replace(/’|‘|`|´/g, "'");
+  }
+  function num(s) {
+    if (s == null || s === "") return NaN;
+    s = String(s).trim().replace(/−/g, "-").replace(/\s/g, "");
+    if (s.indexOf(",") >= 0) { s = s.replace(/\./g, "").replace(",", "."); }
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) { s = s.replace(/\./g, ""); }
+    return parseFloat(s);
+  }
+  function leer(v) {
+    return v === null || v === undefined || v === "" || v === false ||
+      (Array.isArray(v) && v.length === 0);
+  }
+  function readField(id) {
+    var el = feldElement(id);
+    if (!el) { var v = tget(id); return v === undefined ? null : v; }   // JS-gesetzter Wert
+    if (el.tagName.toLowerCase() === "math-field") {
+      if (typeof el.getPromptValue !== "function") return null;
+      var prompt = feldPrompt(el, id);
+      if (!prompt) return null;
+      var promptValue = el.getPromptValue(prompt);
+      return String(promptValue).trim() ? promptValue : null;
+    }
+    var tag = el.tagName.toLowerCase();
+    if (tag === "input") {
+      var t = (el.type || "text").toLowerCase();
+      if (t === "radio") {
+        var g = qa('input[type=radio][name="' + el.name + '"]');
+        for (var i = 0; i < g.length; i++) if (g[i].checked) return g[i].value;
+        return null;
+      }
+      if (t === "checkbox") return !!el.checked;
+    }
+    return el.value;
+  }
+  function feldOk(f) {
+    var v = readField(f.id);
+    if (leer(v)) return false;
+    var typ = f.typ || "text";
+    if (typ === "math") {
+      var computeEngine = window.MathAnswerComputeEngine;
+      if (!computeEngine) return false;
+      var entered = computeEngine.parse(String(v));
+      var expected = computeEngine.parse(String(f.soll));
+      return entered.isValid && expected.isValid && entered.isSame(expected);
+    }
+    if (typ === "zahl") {
+      var n = num(v), s = num(f.soll);
+      if (isNaN(n) || isNaN(s)) return false;
+      var tol = (typeof f.tol === "number") ? f.tol : 0.005;
+      return Math.abs(n - s) <= tol;
+    }
+    if (typ === "text") {
+      var akz = [].concat(f.soll).map(norm);
+      return akz.indexOf(norm(v)) >= 0;
+    }
+    if (typ === "auswahl" || typ === "radio") return String(v) === String(f.soll);
+    if (typ === "checkbox") return !!v === !!f.soll;
+    if (typ === "koordinaten") {
+      return v && typeof v === "object" && Number(v.x) === Number(f.soll.x) && Number(v.y) === Number(f.soll.y);
+    }
+    if (typ === "json") return JSON.stringify(v) === JSON.stringify(f.soll);
+    return false;
+  }
+  function markiere(id, ok) {           // ok: true/false/null (leer)
+    var el = feldElement(id);
+    if (!el) return;
+    if (el.tagName.toLowerCase() === "math-field") {
+      if (ok !== null && typeof el.setPromptState === "function") {
+        var prompt = feldPrompt(el, id);
+        if (prompt) el.setPromptState(prompt, ok ? "correct" : "incorrect");
+      }
+      return;
+    }
+    var ziel = el;
+    if (el.type === "radio") ziel = el.closest("[data-radiogruppe]") || el.parentNode;
+    ziel.classList.remove("ok", "falsch");
+    if (ok === true) ziel.classList.add("ok");
+    if (ok === false) ziel.classList.add("falsch");
+  }
+  function feedback(a, alleOk, alleLeer) {
+    var box = q('[data-feedback="' + a.id + '"]');
+    if (!box) return;
+    box.classList.remove("ok", "falsch", "leer");
+    box.hidden = false;
+    if (alleLeer) { box.classList.add("leer"); box.textContent = a.fbLeer || "Hier fehlt noch eine Eingabe."; return; }
+    if (alleOk) { box.classList.add("ok"); box.textContent = a.fbOk || "Richtig. Vergleiche deinen Weg jetzt mit der Musterlösung."; }
+    else { box.classList.add("falsch"); box.textContent = a.fbFalsch || "Noch nicht ganz. Schau in die Hilfe oder in die Musterlösung – und versuche es dann noch einmal."; }
+  }
+  function themaByN(n) {
+    for (var i = 0; i < cfg.themen.length; i++) if (String(cfg.themen[i].n) === String(n)) return cfg.themen[i];
+    return null;
+  }
+  function setPunkte(n, punkte) {
+    var el = q('[data-track="s' + n + '_punkte"]');
+    if (!el) { if (window.console) console.warn("AB-Kern: Punkte-Feld s" + n + "_punkte fehlt."); return; }
+    el.value = punkte;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  /* ---------- Auswertung eines Themas ---------- */
+  function bewerte(thema, live) {
+    var n = thema.n, punkte = 0, max = 0;
+    var erstfehler = tget("s" + n + "_erstfehler") || {};
+    var erstversuch = tget("s" + n + "_erstversuch");
+    var schreibeErst = live && !erstversuch;
+    if (!erstversuch) erstversuch = {};
+    thema.aufgaben.forEach(function (a) {
+      var alleOk = true, alleLeer = true;
+      a.felder.forEach(function (f) {
+        var v = readField(f.id), ok = feldOk(f);
+        markiere(f.id, leer(v) ? null : ok);
+        if (!leer(v)) alleLeer = false;
+        if (!ok) alleOk = false;
+        if (live && !ok && !leer(v) && erstfehler[f.id] === undefined) {
+          erstfehler[f.id] = String(typeof v === "object" ? JSON.stringify(v) : v).slice(0, 20);
+        }
+      });
+      if (live) {
+        tset(a.id + "_korrekt", alleOk, "checkbox");
+        if (schreibeErst) erstversuch[a.key || a.id] = alleOk;
+      }
+      var p = (typeof a.punkte === "number") ? a.punkte : 1;
+      if (!a.stern) { max += p; if (alleOk) punkte += p; }
+      feedback(a, alleOk, alleLeer);
+      var ml = q('details.loesung[data-loesung="' + a.id + '"]');
+      if (ml) ml.hidden = false;
+    });
+    if (live) {
+      tset("s" + n + "_erstfehler", erstfehler, "json");
+      if (schreibeErst) tset("s" + n + "_erstversuch", erstversuch, "json");
+      setPunkte(n, punkte);
+    }
+    var sum = q('[data-summe="' + n + '"]');
+    if (sum) sum.textContent = punkte + " von " + max + " Aufgaben richtig";
+    fortschritt();
+  }
+  function pruefe(n) {
+    var thema = themaByN(n);
+    if (!thema) return;
+    var versuche = (Number(tget("s" + n + "_versuche")) || 0) + 1;
+    tset("s" + n + "_versuche", versuche, "zahl");
+    bewerte(thema, true);
+    if (T() && T().save) T().save();
+  }
+  function geprueft(n) {
+    var p = tget("s" + n + "_punkte"), v = tget("s" + n + "_versuche");
+    return (p !== null && p !== undefined) || (Number(v) > 0);
+  }
+  function fortschritt() {
+    var el = q("[data-fortschritt]");
+    if (!el) return;
+    var g = 0; cfg.themen.forEach(function (t) { if (geprueft(t.n)) g++; });
+    el.textContent = g + " von " + cfg.themen.length + " Themen geprüft";
+  }
+  function mlHinweis() {
+    var el = q("[data-ml-hinweis]");
+    if (!el) return;
+    var offen = false;
+    cfg.themen.forEach(function (t) { t.aufgaben.forEach(function (a) { if (tget("ml_" + a.id)) offen = true; }); });
+    el.hidden = !offen;
+  }
+
+  /* ---------- Initialisierung ---------- */
+  function fehlerAnzeige(msgs) {              // sichtbar statt stumm: roter Kasten oben im Blatt
+    if (window.console) console.error("AB-Kern: " + msgs.join(" | "));
+    var box = document.createElement("div");
+    box.setAttribute("data-ab-fehler", "");
+    box.style.cssText = "position:sticky;top:0;z-index:9999;background:#FDEAE4;color:#BF4A31;border:2px solid #BF4A31;padding:12px 16px;font:15px/1.5 system-ui,sans-serif";
+    box.innerHTML = "<b>Dieses Arbeitsblatt kann noch nicht ausgewertet werden.</b><br>" + msgs.map(function (m) { return "\u2022 " + String(m).replace(/</g, "&lt;"); }).join("<br>") + "<br><small>Hinweis f\u00fcr die Lehrkraft: Blatt im Arbeitsblatt-Builder pr\u00fcfen oder den Assistenten um Korrektur bitten. Sch\u00fcler sehen diese Meldung nur, wenn das Blatt fehlerhaft ver\u00f6ffentlicht wurde.</small>";
+    document.body.insertBefore(box, document.body.firstChild);
+  }
+  function strukturPruefung() {               // fehlende Pflichtelemente je Thema
+    var msgs = [];
+    if (!cfg.themen || !cfg.themen.length) { msgs.push("ab-config enth\u00e4lt keine Themen."); return msgs; }
+    cfg.themen.forEach(function (t) {
+      if (!q('[data-pruefen="' + t.n + '"]')) msgs.push("Thema " + t.n + ": kein Pr\u00fcfen-Button (data-pruefen=\"" + t.n + "\").");
+      if (!q('[data-track="s' + t.n + '_punkte"]')) msgs.push("Thema " + t.n + ": Punkte-Feld s" + t.n + "_punkte fehlt.");
+      (t.aufgaben || []).forEach(function (a) {
+        (a.felder || []).forEach(function (f) { if (!feldElement(f.id)) msgs.push("Feld \"" + f.id + "\" steht in ab-config, aber nicht im Blatt."); });
+      });
+    });
+    return msgs;
+  }
+  /* ---------- Optional: Knopf „Frage an den Tutor“ (ab-config "tutor": true) ---------- */
+  function tutorAktiv() { return !!(cfg && cfg.tutor); }
+  function feldText(f, v) {
+    if (f.labels && f.labels[String(v)] !== undefined) return String(f.labels[String(v)]);
+    if (typeof v === "object") return JSON.stringify(v).slice(0, 120);
+    return String(v).slice(0, 120);
+  }
+  function feldStatus(id) {            // genau das, was das Kind im Blatt schon sieht – nie mehr
+    var el = feldElement(id); if (!el) return "noch nicht geprüft";
+    if (el.tagName.toLowerCase() === "math-field" && typeof el.getPromptState === "function") {
+      var prompt = feldPrompt(el, id);
+      if (!prompt) return "noch nicht geprüft";
+      var state = el.getPromptState(prompt);
+      if (state === "correct") return "richtig";
+      if (state === "incorrect") return "noch nicht richtig";
+      return "noch nicht geprüft";
+    }
+    var ziel = el; if (el.type === "radio") ziel = el.closest("[data-radiogruppe]") || el.parentNode;
+    if (ziel.classList.contains("ok")) return "richtig";
+    if (ziel.classList.contains("falsch")) return "noch nicht richtig";
+    return "noch nicht geprüft";
+  }
+  function tutorText(t, a) {
+    var z = ["Frage an den Tutor"];
+    if (cfg.paket) z.push("Blatt: " + cfg.paket);
+    z.push("Thema " + t.n + ": " + (t.name || ""));
+    z.push("Aufgabe " + (a.label || a.id) + (a.stern ? " (Sternaufgabe)" : ""));
+    z.push("Meine Eingaben:");
+    (a.felder || []).forEach(function (f) {
+      var v = readField(f.id);
+      z.push("- " + (f.f || f.id) + " -> " + (leer(v) ? "(noch leer)" : feldText(f, v) + " [" + feldStatus(f.id) + "]"));
+    });
+    z.push("Hilfe im Blatt: " + (tget("hilfe_" + a.id) ? "schon geöffnet" : "noch nicht geöffnet") + "; Musterlösung: " + (tget("ml_" + a.id) ? "schon geöffnet" : "noch nicht geöffnet"));
+    z.push("Meine Frage: ");
+    return z.join("\n");
+  }
+  function kopiereText(text, fertig) {
+    function fallback() {
+      var ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0"; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta); return ok;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { fertig(true); }, function () { fertig(fallback()); });
+    } else fertig(fallback());
+  }
+  function tutorFrage(t, a, status, row) {
+    var text = tutorText(t, a);
+    tset("tutor_" + a.id, (Number(tget("tutor_" + a.id)) || 0) + 1, "zahl");
+    if (T() && T().save) T().save();
+    var LS = window.LERNSCHLEIFE;
+    if (LS && typeof LS.tutor === "function") {          // Server-Modus: Tutor in der Seitenleiste
+      LS.tutor(text, { thema: t.n, aufgabe: a.id, titel: a.label || a.id });
+      status.textContent = "Deine Eingaben sind beim Tutor. Schreib jetzt deine Frage.";
+      return;
+    }
+    kopiereText(text, function (ok) {
+      var alt = row.querySelector("textarea"); if (alt) alt.parentNode.removeChild(alt);
+      if (ok) { status.textContent = "Kopiert. Öffne jetzt im Klassenraum den Tutor, füge den Text ein (Strg+V / ⌘V) und schreib deine Frage dazu."; }
+      else {
+        status.textContent = "Kopieren hat nicht geklappt. Markiere den Text unten und kopiere ihn selbst.";
+        var ta = document.createElement("textarea"); ta.readOnly = true; ta.value = text; row.appendChild(ta); ta.focus(); ta.select();
+      }
+    });
+  }
+  function tutorKnoepfe() {
+    if (!tutorAktiv()) return;
+    var st = document.createElement("style");
+    st.textContent = ".ab-tutor{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:8px 0}"
+      + ".ab-tutor button{font:inherit;font-weight:600;background:#fff;color:#2C566F;border:2px solid #2C566F;border-radius:8px;padding:8px 14px;min-height:44px;cursor:pointer}"
+      + ".ab-tutor .ab-tutor-status{flex:1 1 220px;font-size:.92em;line-height:1.4;color:#2C566F}"
+      + ".ab-tutor textarea{flex:1 1 100%;min-height:140px;font:inherit;font-size:.9em}"
+      + "@media print{.ab-tutor{display:none}}";
+    document.head.appendChild(st);
+    cfg.themen.forEach(function (t) {
+      (t.aufgaben || []).forEach(function (a) {
+        var box = q('[data-feedback="' + a.id + '"]'); if (!box || !box.parentNode) return;
+        var row = document.createElement("div"); row.className = "ab-tutor"; row.setAttribute("data-tutor", a.id);
+        var b = document.createElement("button"); b.type = "button"; b.textContent = "Frage an den Tutor";
+        b.setAttribute("aria-label", "Frage an den Tutor zu Aufgabe " + (a.label || a.id));
+        var s = document.createElement("span"); s.className = "ab-tutor-status"; s.setAttribute("aria-live", "polite");
+        row.appendChild(b); row.appendChild(s);
+        box.parentNode.insertBefore(row, box);
+        b.addEventListener("click", function () { tutorFrage(t, a, s, row); });
+      });
+    });
+  }
+
+  function init() {
+    var src = q("#ab-config");
+    if (!src) { fehlerAnzeige(["Die Konfiguration <script type=\"application/json\" id=\"ab-config\"> fehlt."]); return; }
+    try { cfg = JSON.parse(src.textContent); }
+    catch (e) { cfg = null; fehlerAnzeige(["ab-config ist kein g\u00fcltiges JSON: " + e.message]); return; }
+    var sp = strukturPruefung(); if (sp.length) fehlerAnzeige(sp);
+    qa("details.loesung").forEach(function (d) { d.hidden = true; });
+    qa("[data-pruefen]").forEach(function (b) {
+      b.addEventListener("click", function () { pruefe(b.getAttribute("data-pruefen")); });
+    });
+    qa("details.hilfe[data-hilfe]").forEach(function (d) {
+      d.addEventListener("toggle", function () { if (d.open) tset("hilfe_" + d.getAttribute("data-hilfe"), true, "checkbox"); });
+    });
+    qa("details.loesung[data-loesung]").forEach(function (d) {
+      d.addEventListener("toggle", function () {
+        if (d.open) { tset("ml_" + d.getAttribute("data-loesung"), true, "checkbox"); mlHinweis(); }
+      });
+    });
+    tutorKnoepfe();
+  }
+  function restore() {           // nach dem Wrapper-Restore (window.load)
+    if (!cfg) return;
+    cfg.themen.forEach(function (t) { if (geprueft(t.n)) bewerte(t, false); });
+    mlHinweis(); fortschritt();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+  window.addEventListener("load", restore);
+
+  /* ---------- Manifest aus der Konfiguration ableiten ---------- */
+  function manifest() {
+    var m = { version: 2, paket: cfg.paket || "", fach: cfg.fach || "", klasse: cfg.klasse || "",
+      erstellt: cfg.erstellt || "", maxPunkte: 0, themen: [], fragen: {}, wertLabels: {}, felder: cfg.felder || {}, tutor: tutorAktiv() };
+    cfg.themen.forEach(function (t) {
+      var th = { n: t.n, name: t.name, max: 0, punkte: "s" + t.n + "_punkte", selbst: t.selbst || null,
+        versuche: "s" + t.n + "_versuche", erstversuch: "s" + t.n + "_erstversuch", erstfehler: "s" + t.n + "_erstfehler", aufgaben: [] };
+      t.aufgaben.forEach(function (a) {
+        var p = (typeof a.punkte === "number") ? a.punkte : 1;
+        if (!a.stern) th.max += p;
+        th.aufgaben.push({ key: a.key || a.id, id: a.id, label: a.label, stern: !!a.stern, punkte: p,
+          felder: a.felder.map(function (f) { return f.id; }),
+          tracking: { korrekt: a.id + "_korrekt", ml: "ml_" + a.id, hilfe: "hilfe_" + a.id, tutor: "tutor_" + a.id } });
+        a.felder.forEach(function (f) {
+          m.fragen[f.id] = { f: f.f || "", l: f.l || String(f.soll), typ: f.typ || "text" };
+          if (f.labels) m.wertLabels[f.id] = f.labels;
+        });
+      });
+      m.maxPunkte += th.max;
+      m.themen.push(th);
+    });
+    return m;
+  }
+  return { pruefe: pruefe, manifest: manifest, config: function () { return cfg; }, get: tget, set: tset };
+})();
+
+</script>
+</body>
+</html>
