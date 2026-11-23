@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aufgaben zur WENN-Funktion – Arbeitsblatt</title>
+  <style>
+    :root {
+      --bg: #f6f9fc;
+      --grid: #dce6f0;
+      --paper: #fff;
+      --ink: #1b2a3a;
+      --soft: #5b6b7c;
+      --pen: #1f4fd8;
+      --ok: #17794a;
+      --bad: #c0392b;
+      --fn: #eceff3;
+      --line: #1b2a3a;
+      --serif: "Baskerville", "Libre Baskerville", "Baskerville Old Face", Georgia, serif;
+      --mono: "Consolas", "SFMono-Regular", "Menlo", monospace;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #12171e;
+        --grid: #1d2733;
+        --paper: #19212b;
+        --ink: #e5ebf2;
+        --soft: #93a2b3;
+        --pen: #7ea2ff;
+        --ok: #5fcf93;
+        --bad: #ff8a7a;
+        --fn: #26303c;
+        --line: #e5ebf2;
+        color-scheme: dark
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #12171e;
+      --grid: #1d2733;
+      --paper: #19212b;
+      --ink: #e5ebf2;
+      --soft: #93a2b3;
+      --pen: #7ea2ff;
+      --ok: #5fcf93;
+      --bad: #ff8a7a;
+      --fn: #26303c;
+      --line: #e5ebf2;
+      color-scheme: dark
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font: 18px/1.5 var(--serif);
+      min-height: 100vh
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 18px 60px
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    h1 {
+      font-size: 1.7rem;
+      margin: 0;
+      font-weight: 700
+    }
+
+    .meta {
+      color: var(--soft);
+      font-size: .95rem
+    }
+
+    .sheet {
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      border-radius: 3px;
+      padding: 20px 20px 24px;
+      box-shadow: 5px 5px 0 var(--grid)
+    }
+
+    .diagram {
+      overflow-x: auto;
+      text-align: center;
+      padding: 4px 0 10px
+    }
+
+    svg {
+      max-width: 100%;
+      height: auto;
+      overflow: visible
+    }
+
+    svg text {
+      font-family: var(--mono);
+      fill: var(--ink);
+      font-size: 16px
+    }
+
+    .node rect {
+      fill: var(--paper);
+      stroke: var(--line);
+      stroke-width: 1.6
+    }
+
+    .node.fn rect {
+      fill: var(--fn)
+    }
+
+    .edge {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 1.5
+    }
+
+    .dot {
+      fill: var(--line)
+    }
+
+    .badge {
+      font-size: 13px;
+      fill: var(--pen);
+      display: none;
+      font-weight: 700
+    }
+
+    .h1 .badge {
+      display: block
+    }
+
+    .h2 .node:not(.used),
+    .h2 .edge:not(.used),
+    .h2 .dotg:not(.used) {
+      opacity: .22
+    }
+
+    .h2 .node.used rect {
+      stroke: var(--pen);
+      stroke-width: 2.4
+    }
+
+    .h2 .edge.used {
+      stroke: var(--pen);
+      marker-end: url(#ahb)
+    }
+
+    .out {
+      font-family: var(--serif);
+      font-style: italic;
+      fill: var(--soft)
+    }
+
+    .ask {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-top: 1.5px dashed var(--soft);
+      padding-top: 16px;
+      margin-top: 6px
+    }
+
+    .given {
+      font-family: var(--mono);
+      font-size: 1.15rem;
+      font-weight: 700
+    }
+
+    label {
+      color: var(--soft)
+    }
+
+    input[type=text] {
+      font: inherit;
+      font-family: var(--mono);
+      width: 7em;
+      padding: 6px 10px;
+      border: 1.5px solid var(--ink);
+      border-radius: 3px;
+      background: var(--paper);
+      color: var(--ink)
+    }
+
+    button {
+      font: inherit;
+      padding: 6px 16px;
+      border: 1.5px solid var(--ink);
+      border-radius: 3px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer
+    }
+
+    button.main {
+      background: var(--pen);
+      border-color: var(--pen);
+      color: #fff
+    }
+
+    :root[data-theme="dark"] button.main {
+      color: #10151c
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) button.main {
+        color: #10151c
+      }
+    }
+
+    button:disabled {
+      opacity: .4;
+      cursor: default
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px)
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--pen);
+      outline-offset: 2px
+    }
+
+    .fb {
+      min-height: 3.2em;
+      margin-top: 14px;
+      font-size: 1.05rem
+    }
+
+    .fb.ok {
+      color: var(--ok)
+    }
+
+    .fb.bad {
+      color: var(--bad)
+    }
+
+    .fb small {
+      display: block;
+      color: var(--soft);
+      font-size: .92rem
+    }
+
+    .tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px
+    }
+
+    details {
+      display: none;
+      margin-top: 26px;
+      background: var(--paper);
+      border: 1.5px solid var(--soft);
+      border-radius: 3px;
+      padding: 10px 16px
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--soft)
+    }
+
+    textarea {
+      width: 100%;
+      height: 9em;
+      font: 14px/1.5 var(--mono);
+      padding: 8px;
+      border: 1.5px solid var(--ink);
+      border-radius: 3px;
+      background: var(--bg);
+      color: var(--ink);
+      margin: 10px 0
+    }
+
+    .err {
+      color: var(--bad);
+      font-size: .95rem
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      button:hover:not(:disabled) {
+        transform: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>Aufgaben zur WENN-Funktion</h1>
+      <div class="meta" id="progress"></div>
+    </header>
+    <section class="sheet" aria-label="Aufgabe">
+      <p style="margin:0 0 8px">Die Pfeile zeigen, wie die Werte von oben nach unten in die Funktionen fließen.
+        Reihenfolge der Eingänge von links nach rechts: Bedingung, dann-Wert, sonst-Wert. Welche Zahl kommt unten
+        heraus?</p>
+      <div class="diagram" id="diagram"></div>
+      <div class="ask">
+        <span class="given" id="given"></span>
+        <label for="ans">Ausgabe:</label>
+        <input type="text" id="ans" inputmode="decimal" autocomplete="off">
+        <button class="main" id="check">Prüfen</button>
+      </div>
+      <div class="fb" id="fb" role="status" aria-live="polite"></div>
+      <div class="tools">
+        <button id="hint">Hinweis</button>
+        <button id="solve">Lösung zeigen</button>
+        <button id="next" class="main" hidden>Nächste Aufgabe</button>
+      </div>
+    </section>
+    <details>
+      <summary>Aufgaben bearbeiten</summary>
+      <p class="meta" style="margin:8px 0 0">Eine Aufgabe pro Zeile: Ausdruck, optional <code>| von..bis</code> für den
+        Wertebereich. Funktionen: WENN, UND, ODER; Vergleiche: &gt;= &lt;= &gt; &lt; = &lt;&gt;. Trennzeichen:
+        Semikolon.</p>
+      <textarea id="src" spellcheck="false"></textarea>
+      <button id="apply">Übernehmen</button>
+      <div class="err" id="err"></div>
+    </details>
+  </main>
+  <script>
+    const DEFAULT = `WENN(Größe >= 50; 20; 30) | 0..100
+WENN(Größe >= 50; 20; WENN(Größe >= 10; 40; 30)) | 0..100
+WENN(Alter >= 70; 7; WENN(Alter <= 21; 8; 10)) | 0..100`;
+    const OPS = { '>=': '≥', '≥': '≥', '<=': '≤', '≤': '≤', '<>': '≠', '≠': '≠', '!=': '≠', '>': '>', '<': '<', '=': '=' };
+    const GAP = 110, ROW = 112, H = 34, AL = 9;
+
+    /* ---------- Parser ---------- */
+    function tokenize(s) {
+      const t = [], re = /\s*(\d+(?:\.\d+)?|[A-Za-zÄÖÜäöüß_][\wÄÖÜäöüß]*|>=|<=|<>|!=|[≥≤≠]|[><=();,])/y;
+      while (re.lastIndex < s.length) {
+        if (/^\s*$/.test(s.slice(re.lastIndex))) break;
+        const m = re.exec(s);
+        if (!m) throw new Error('Unerwartetes Zeichen bei „' + s.slice(re.lastIndex).trim().slice(0, 6) + '“');
+        t.push(m[1]);
+      }
+      return t;
+    }
+    function parse(src) {
+      const t = tokenize(src); let i = 0; const vars = {};
+      const expect = x => { if (t[i++] !== x) throw new Error('„' + x + '“ erwartet'); };
+      function cmp() {
+        const a = atom();
+        if (OPS[t[i]]) { const op = OPS[t[i++]]; return { k: 'fn', name: op, args: [a, atom()] }; }
+        return a;
+      }
+      function atom() {
+        const x = t[i++];
+        if (x === undefined) throw new Error('Ausdruck unvollständig');
+        if (x === '(') { const e = cmp(); expect(')'); return e; }
+        if (/^\d/.test(x)) return { k: 'num', v: parseFloat(x), args: [] };
+        if (/^[A-Za-zÄÖÜäöüß_]/.test(x)) {
+          if (t[i] === '(') {
+            i++; const args = [];
+            if (t[i] !== ')') { args.push(cmp()); while (t[i] === ';' || t[i] === ',') { i++; args.push(cmp()); } }
+            expect(')');
+            return { k: 'fn', name: x.toUpperCase(), args };
+          }
+          return vars[x] || (vars[x] = { k: 'var', name: x, args: [] });
+        }
+        throw new Error('Unerwartet: „' + x + '“');
+      }
+      const root = cmp();
+      if (i < t.length) throw new Error('Überflüssiger Text am Ende');
+      if (root.k !== 'fn') throw new Error('Der Ausdruck muss eine Funktion sein');
+      return { root, vars: Object.keys(vars) };
+    }
+
+    /* ---------- Auswertung mit Weg ---------- */
+    function evaluate(root, env) {
+      const vals = new Map(), used = new Set(), steps = [];
+      const fmt = v => typeof v === 'boolean' ? (v ? 'wahr' : 'falsch') : String(v).replace('.', ',');
+      function ev(n) {
+        used.add(n); let r;
+        if (n.k === 'num') r = n.v;
+        else if (n.k === 'var') { if (!(n.name in env)) throw new Error('Variable ' + n.name + ' fehlt'); r = env[n.name]; }
+        else {
+          const a = n.args;
+          switch (n.name) {
+            case 'WENN': {
+              const c = ev(a[0]);
+              const txt = a[0].k === 'fn' && a[0].args.length === 2 && OPS[a[0].name] ?
+                `${fmt(vals.get(a[0].args[0]))} ${a[0].name} ${fmt(vals.get(a[0].args[1]))}` : 'Bedingung';
+              r = ev(c ? a[1] : a[2]);
+              steps.push(`${txt} ist ${c ? 'wahr' : 'falsch'} → ${c ? 'dann' : 'sonst'}-Wert ${fmt(r)}`);
+              break;
+            }
+            case 'UND': r = a.map(ev).every(Boolean); break;
+            case 'ODER': r = a.map(ev).some(Boolean); break;
+            case '≥': r = ev(a[0]) >= ev(a[1]); break;
+            case '≤': r = ev(a[0]) <= ev(a[1]); break;
+            case '>': r = ev(a[0]) > ev(a[1]); break;
+            case '<': r = ev(a[0]) < ev(a[1]); break;
+            case '=': r = ev(a[0]) === ev(a[1]); break;
+            case '≠': r = ev(a[0]) !== ev(a[1]); break;
+            default: throw new Error('Unbekannte Funktion ' + n.name);
+          }
+        }
+        vals.set(n, r); return r;
+      }
+      const result = ev(root);
+      return { result, vals, used, steps: steps.reverse(), fmt };
+    }
+
+    /* ---------- Layout + SVG ---------- */
+    function render(root, evaluation) {
+      const nodes = [];
+
+      function collectNodes(node) {
+        if (nodes.includes(node)) return;
+        nodes.push(node);
+        node.args.forEach(collectNodes);
+      }
+      collectNodes(root);
+
+      nodes.forEach(node => {
+        node.lvl = 0;
+        node.x = undefined;
+        node.outs = 0;
+        node.label = node.k === 'num' ? String(node.v).replace('.', ',') : node.name;
+        node.w = node.k === 'fn'
+          ? Math.max(70, node.label.length * 11 + 24)
+          : Math.max(52, node.label.length * 10 + 22);
+      });
+
+      function assignLevels(node, level) {
+        node.lvl = Math.max(node.lvl, level);
+        node.args.forEach(child => assignLevels(child, level + 1));
+      }
+      assignLevels(root, 0);
+
+      let leafPosition = 0;
+      function assignLeafPositions(node) {
+        if (node.x !== undefined) return;
+        if (!node.args.length) {
+          node.x = leafPosition++ * GAP;
+          return;
+        }
+        node.args.forEach(assignLeafPositions);
+      }
+      assignLeafPositions(root);
+
+      const maxLevel = Math.max(...nodes.map(node => node.lvl));
+      for (let level = maxLevel; level >= 0; level--) {
+        const row = nodes.filter(node => node.lvl === level);
+        row.forEach(node => {
+          if (node.args.length) {
+            node.x = node.args.reduce((total, child) => total + child.x, 0) / node.args.length;
+          }
+        });
+        row.sort((a, b) => a.x - b.x);
+        for (let i = 1; i < row.length; i++) {
+          const minimumGap = (row[i - 1].w + row[i].w) / 2 + 20;
+          if (row[i].x - row[i - 1].x < minimumGap) {
+            row[i].x = row[i - 1].x + minimumGap;
+          }
+        }
+      }
+
+      nodes.forEach(node => {
+        node.y = 28 + (maxLevel - node.lvl) * ROW + H / 2;
+        node.args.forEach(child => child.outs++);
+      });
+
+      const minX = Math.min(...nodes.map(node => node.x - node.w / 2)) - 14;
+      const maxX = Math.max(...nodes.map(node => node.x + node.w / 2)) + 70;
+      const svgHeight = 28 + maxLevel * ROW + H + 56;
+      const svgWidth = maxX - minX;
+      let edges = '';
+      let boxes = '';
+
+      nodes.forEach(parent => {
+        const argumentCount = parent.args.length;
+        const inputStep = argumentCount > 1
+          ? Math.min(26, (parent.w - 16) / (argumentCount - 1))
+          : 0;
+
+        parent.args.forEach((child, index) => {
+          const targetX = parent.x + (index - (argumentCount - 1) / 2) * inputStep;
+          const targetY = parent.y - H / 2;
+          const sourceX = child.x;
+          let sourceY = child.y + H / 2;
+          const used = evaluation.used.has(child) && evaluation.used.has(parent) ? ' used' : '';
+
+          if (child.outs > 1) {
+            edges += `<g class="dotg${used}"><line class="edge${used}" x1="${sourceX}" y1="${sourceY}" x2="${sourceX}" y2="${sourceY + 14}"/><circle class="dot" cx="${sourceX}" cy="${sourceY + 14}" r="3.5"/></g>`;
+            sourceY += 14;
+          }
+
+          const edgeEndY = targetY - AL;
+          const controlY = (sourceY + edgeEndY) / 2;
+          edges += `<path class="edge${used}" d="M${sourceX} ${sourceY}C${sourceX} ${controlY} ${targetX} ${controlY} ${targetX} ${edgeEndY}" marker-end="url(#ah)"/>`;
+        });
+      });
+
+      nodes.forEach(node => {
+        const used = evaluation.used.has(node) ? ' used' : '';
+        const value = evaluation.vals.get(node);
+        boxes += `<g class="node ${node.k === 'fn' ? 'fn' : 'leaf'}${used}"><rect x="${node.x - node.w / 2}" y="${node.y - H / 2}" width="${node.w}" height="${H}" rx="${node.k === 'fn' ? 9 : 2}"/><text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="central">${node.label}</text>` +
+          (typeof value === 'boolean' ? `<text class="badge" x="${node.x + node.w / 2 + 7}" y="${node.y}" dominant-baseline="central">${value ? 'wahr' : 'falsch'}</text>` : '') + `</g>`;
+      });
+
+      const outputY = root.y + H / 2;
+      return `<svg viewBox="${minX} 0 ${svgWidth} ${svgHeight}" width="${svgWidth}" role="img" aria-label="Diagramm der Funktion ${root.name}"><defs><marker id="ah" viewBox="0 0 10 10" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth="${AL}" markerHeight="${AL}" orient="auto"><path d="M0 .5L10 5L0 9.5z" fill="var(--line)"/></marker><marker id="ahb" viewBox="0 0 10 10" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth="${AL}" markerHeight="${AL}" orient="auto"><path d="M0 .5L10 5L0 9.5z" fill="var(--pen)"/></marker></defs>${edges}${boxes}<path class="edge" d="M${root.x} ${outputY}L${root.x} ${outputY + 40 - AL}" marker-end="url(#ah)"/><text class="out" x="${root.x + 10}" y="${outputY + 30}">Ausgabe</text></svg>`;
+    }
+
+    /* ---------- Aufgaben ---------- */
+    let tasks = [], ti = 0, cur = null, hint = 0, tries = 0, done = false, good = 0, round = 0;
+    const $ = id => document.getElementById(id);
+    function loadTasks(text) {
+      const out = [], errs = [];
+      text.split('\n').forEach((line, k) => {
+        if (!line.trim()) return;
+        const [src, rng] = line.split('|'); let lo = 0, hi = 100;
+        const m = rng && rng.match(/(-?\d+)\s*\.\.\s*(-?\d+)/); if (m) { lo = +m[1]; hi = +m[2]; }
+        try { parse(src); out.push({ src: src.trim(), lo, hi }); } catch (e) { errs.push(`Zeile ${k + 1}: ${e.message}`); }
+      });
+      return { out, errs };
+    }
+    const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+    function startTask() {
+      const t = tasks[ti], p = parse(t.src);
+      const consts = []; (function w(n) { if (n.k === 'num') consts.push(n.v); n.args.forEach(w); })(p.root);
+      const env = {};
+      p.vars.forEach(v => {
+        let x = Math.random() < .6 && consts.length ? consts[rint(0, consts.length - 1)] + rint(-1, 1) : rint(t.lo, t.hi);
+        env[v] = Math.min(t.hi, Math.max(t.lo, x));
+      });
+      const ev = evaluate(p.root, env);
+      cur = { p, env, ev }; hint = 0; tries = 0; done = false;
+      $('diagram').innerHTML = render(p.root, ev);
+      $('given').textContent = p.vars.map(v => `${v} = ${env[v]}`).join(',  ');
+      $('ans').value = ''; $('ans').disabled = false; $('check').disabled = false;
+      $('hint').disabled = false; $('hint').textContent = 'Hinweis'; $('solve').disabled = false; $('next').hidden = true;
+      setFb('', ''); updateProgress(); $('ans').focus({ preventScroll: true });
+    }
+    function updateProgress() { $('progress').textContent = `Aufgabe ${ti + 1} von ${tasks.length}  ·  beim ersten Versuch richtig: ${good}`.replace('  ·  ', '; '); }
+    function setFb(msg, cls, sub) { $('fb').className = 'fb ' + cls; $('fb').innerHTML = msg + (sub ? `<small>${sub}</small>` : ''); }
+    function finish(ok) {
+      done = true; $('ans').disabled = true; $('check').disabled = true; $('hint').disabled = true; $('solve').disabled = true;
+      $('next').hidden = false; $('next').textContent = ti === tasks.length - 1 ? 'Ergebnis ansehen' : 'Nächste Aufgabe'; $('next').focus();
+    }
+    function check() {
+      if (done) return;
+      const raw = $('ans').value.trim().toLowerCase().replace(',', '.');
+      if (!raw) { setFb('Bitte gib zuerst eine Zahl ein.', 'bad'); return; }
+      const exp = cur.ev.result, isB = typeof exp === 'boolean';
+      let ok;
+      if (isB) ok = raw === (exp ? 'wahr' : 'falsch');
+      else { const x = Number(raw); if (Number.isNaN(x)) { setFb('Das ist keine Zahl. Schreibe nur die Zahl, die unten herauskommt.', 'bad'); return; } ok = Math.abs(x - exp) < 1e-9; }
+      const path = 'Begründung: ' + cur.ev.steps.join('; dann ') + '.';
+      if (ok) {
+        if (tries === 0 && hint === 0) good++;
+        setFb(tries ? `Richtig, im ${tries + 1}. Versuch.` : 'Richtig!', 'ok', path); updateProgress(); finish(true);
+      } else {
+        tries++;
+        const leafVals = [...cur.ev.vals].filter(([n]) => n.k === 'num').map(([n]) => n.v);
+        let msg = leafVals.includes(Number(raw)) ? 'Nicht richtig. Diese Zahl steht zwar im Diagramm, kommt bei deinem Wert aber nicht unten an. Prüfe die Bedingungen von oben nach unten.'
+          : tries === 1 ? 'Nicht richtig. Prüfe zuerst die Bedingung ganz oben im Diagramm: Ist sie bei deinem Wert wahr oder falsch?'
+            : 'Immer noch nicht. Nimm einen Hinweis zu Hilfe.';
+        setFb(msg, 'bad'); $('ans').select();
+      }
+    }
+    $('check').onclick = check;
+    $('ans').onkeydown = e => { if (e.key === 'Enter') check(); };
+    $('hint').onclick = () => {
+      if (done) return;
+      hint++; const svg = $('diagram').firstChild;
+      if (hint === 1) { svg.classList.add('h1'); setFb('Die Bedingungen sind jetzt mit wahr oder falsch beschriftet. Welcher Wert wird in jedem WENN gewählt?', ''); $('hint').textContent = 'Noch ein Hinweis'; }
+      else { svg.classList.add('h2'); setFb('Der Weg, den dein Wert nimmt, ist blau hervorgehoben. Blasse Teile spielen keine Rolle.', ''); $('hint').disabled = true; }
+    };
+    $('solve').onclick = () => {
+      if (done) return;
+      const e = cur.ev; $('diagram').firstChild.classList.add('h1', 'h2');
+      setFb(`Lösung: ${e.fmt(e.result)}`, '', 'Begründung: ' + e.steps.join('; dann ') + '.'); finish(false);
+    };
+    $('next').onclick = () => {
+      if (ti === tasks.length - 1 && $('next').textContent === 'Ergebnis ansehen') {
+        $('diagram').innerHTML = ''; $('given').textContent = ''; $('ans').disabled = true; $('check').disabled = true; $('hint').disabled = true; $('solve').disabled = true;
+        setFb(`Geschafft: ${good} von ${tasks.length} Aufgaben beim ersten Versuch richtig.`, good === tasks.length ? 'ok' : '', 'Mit neuen Werten üben?');
+        $('next').textContent = 'Neue Runde'; $('next').dataset.again = '1'; return;
+      }
+      if ($('next').dataset.again) { delete $('next').dataset.again; ti = 0; good = 0; round++; }
+      else ti++;
+      startTask();
+    };
+    $('apply').onclick = () => {
+      const { out, errs } = loadTasks($('src').value);
+      $('err').textContent = errs.join(' · ');
+      if (!out.length) { if (!errs.length) $('err').textContent = 'Keine Aufgaben gefunden.'; return; }
+      tasks = out; ti = 0; good = 0; startTask();
+    };
+    $('src').value = DEFAULT;
+    tasks = loadTasks(DEFAULT).out; startTask();
+  </script>
+</body>
+
+</html>
