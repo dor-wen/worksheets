@@ -393,6 +393,145 @@
     color: #2f6cb3;
   }
 
+  /* ---------- URLs: Aufbau ---------- */
+  .url-bau {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0 4px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .url-stueck {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 auto;
+  }
+  .url-stueck .seg {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 9px 7px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .url-stueck:first-child .seg { border-radius: 7px 0 0 7px; }
+  .url-stueck:last-child .seg { border-radius: 0 7px 7px 0; }
+  .seg-protokoll { background: #ffcdd2; color: #b71c1c; }
+  .seg-subdomain { background: #bbdefb; color: #0d47a1; }
+  .seg-domain    { background: #c8e6c9; color: #1b5e20; }
+  .seg-tld       { background: #ffe0b2; color: #e65100; }
+  .seg-pfad      { background: #e1bee7; color: #4a148c; }
+  .url-punkt { flex: 0 0 auto; }
+  .url-punkt .seg {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 9px 4px;
+    background: #e0e0e0;
+    color: #607d8b;
+  }
+  .url-stueck select {
+    font-size: 0.78rem;
+    padding: 5px 4px;
+    border: 1px solid #c3d2e0;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--text);
+  }
+  .url-stueck.ok select { border-color: var(--good); background: var(--good-bg); }
+  .url-stueck.nope select { border-color: var(--bad); background: var(--bad-bg); }
+
+  .def-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  @media (max-width: 560px) { .def-grid { grid-template-columns: 1fr; } }
+  .def-box {
+    background: #f7fafc;
+    border: 1px solid #d7e3ee;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.92rem;
+  }
+  .def-box strong { color: var(--primary-dark); }
+
+  .antwort-input {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.95rem;
+    padding: 8px 10px;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    width: 220px;
+    max-width: 100%;
+  }
+  .antwort-input:focus { outline: none; border-color: var(--accent); }
+
+  .vergleich {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 12px 0;
+  }
+  .vergleich th, .vergleich td {
+    border: 1px solid #d7e3ee;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .vergleich th { background: #eaf2fc; color: var(--primary-dark); }
+  .vergleich code, .quiz-item code, .track-url code {
+    font-family: "Consolas", "Courier New", monospace;
+    background: #f4f7fb;
+    border-radius: 4px;
+    padding: 1px 5px;
+    word-break: break-all;
+  }
+
+  .quiz-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .quiz-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    background: #f9fbfd;
+    border: 1px solid #dde7f0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  .quiz-item .waehl {
+    border: 1px solid var(--primary);
+    background: #fff;
+    color: var(--primary-dark);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .quiz-item .waehl:hover:not(:disabled) { background: #eaf2fc; }
+  .quiz-item .waehl:disabled { opacity: 0.45; cursor: default; }
+  .quiz-item.correct { border-color: var(--good); background: var(--good-bg); }
+  .quiz-item.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .quiz-item .hinweis { grid-column: 1 / -1; font-size: 0.82rem; display: none; }
+  .quiz-item.beantwortet .hinweis { display: block; }
+
+  .track-wrap { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .track-url {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.85rem;
+    background: #f4f7fb;
+    border: 1px solid #d7e3ee;
+    border-radius: 8px;
+    padding: 8px 10px;
+    word-break: break-all;
+  }
+  .track-url .param { background: #ffe0b2; border-radius: 3px; padding: 1px 2px; }
+
   footer {
     text-align: center;
     color: var(--muted);
@@ -410,6 +549,7 @@
 <nav class="tabs">
   <button class="tab active" data-page="internet">Das Internet</button>
   <button class="tab" data-page="ip">IP-Adressen</button>
+  <button class="tab" data-page="url">URLs</button>
   <button class="tab" data-page="dns">DNS</button>
   <button class="tab" data-page="html">Webseiten aufbauen</button>
 </nav>
@@ -528,6 +668,139 @@
 
   </section>
 
+  <!-- ================= Seite: URLs ================= -->
+  <section class="page" id="page-url">
+
+    <div class="card">
+      <h2>🔗 Wie ist eine Webadresse aufgebaut?</h2>
+      <p>
+        Eine <strong>URL</strong> (<em>Uniform Resource Locator</em>) ist die vollständige
+        Adresse einer Webseite. Ordne jedem farbigen Teil den passenden Begriff zu.
+      </p>
+
+      <div class="url-bau">
+        <div class="url-stueck" data-part="protokoll">
+          <div class="seg seg-protokoll">https://</div>
+          <select aria-label="Teil 1">
+            <option value="">–</option><option value="protokoll">Protokoll</option><option value="subdomain">Subdomain</option><option value="domain">Domainname</option><option value="tld">TLD</option><option value="pfad">Pfad</option>
+          </select>
+        </div>
+        <div class="url-stueck" data-part="subdomain">
+          <div class="seg seg-subdomain">musik</div>
+          <select aria-label="Teil 2">
+            <option value="">–</option><option value="protokoll">Protokoll</option><option value="subdomain">Subdomain</option><option value="domain">Domainname</option><option value="tld">TLD</option><option value="pfad">Pfad</option>
+          </select>
+        </div>
+        <div class="url-punkt"><div class="seg seg-punkt">.</div></div>
+        <div class="url-stueck" data-part="domain">
+          <div class="seg seg-domain">schulradio</div>
+          <select aria-label="Teil 3">
+            <option value="">–</option><option value="protokoll">Protokoll</option><option value="subdomain">Subdomain</option><option value="domain">Domainname</option><option value="tld">TLD</option><option value="pfad">Pfad</option>
+          </select>
+        </div>
+        <div class="url-punkt"><div class="seg seg-punkt">.</div></div>
+        <div class="url-stueck" data-part="tld">
+          <div class="seg seg-tld">de</div>
+          <select aria-label="Teil 4">
+            <option value="">–</option><option value="protokoll">Protokoll</option><option value="subdomain">Subdomain</option><option value="domain">Domainname</option><option value="tld">TLD</option><option value="pfad">Pfad</option>
+          </select>
+        </div>
+        <div class="url-stueck" data-part="pfad">
+          <div class="seg seg-pfad">/archiv/2026.html</div>
+          <select aria-label="Teil 5">
+            <option value="">–</option><option value="protokoll">Protokoll</option><option value="subdomain">Subdomain</option><option value="domain">Domainname</option><option value="tld">TLD</option><option value="pfad">Pfad</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px">
+        <button class="action btn-good" id="urlCheck">✅ Prüfen</button>
+        <button class="action" id="urlReset" style="display:inline-block;background:var(--accent);color:#4e342e">🔀 Zurücksetzen</button>
+      </div>
+
+      <div class="feedback" id="urlFeedback"></div>
+    </div>
+
+    <div class="card">
+      <h2>📖 TLD und Subdomain</h2>
+      <div class="def-grid">
+        <div class="def-box">
+          <strong>TLD (Top-Level-Domain)</strong><br>
+          Der letzte Teil nach dem letzten Punkt, z. B. <code class="inline">de</code>
+          in <code class="inline">schule.de</code> (Deutschland),
+          <code class="inline">at</code>, <code class="inline">ch</code>,
+          <code class="inline">com</code> oder <code class="inline">org</code>.
+          Die Punkte selbst sind nur Trennzeichen.
+        </div>
+        <div class="def-box">
+          <strong>Subdomain</strong><br>
+          Der Teil <em>vor</em> der Domain: <code class="inline">musik</code>,
+          <code class="inline">sport</code> oder <code class="inline">www</code>.
+          Auch <code class="inline">www</code> ist nur eine Subdomain – keine eigene Domain!
+        </div>
+      </div>
+      <p>
+        Die Sportredaktion des Schulradios soll eine eigene Adresse bekommen.
+        Welche Subdomain passt?<br>
+        <input class="antwort-input" id="subInput" placeholder="deine Antwort" autocomplete="off">
+        <button class="snippet-btn" id="subCheck">Prüfen</button>
+      </p>
+      <div class="feedback" id="subFeedback"></div>
+    </div>
+
+    <div class="card">
+      <h2>🗂️ Domain oder Ordner auf dem PC?</h2>
+      <p>
+        Ein Pfad in einer URL sieht aus wie ein Ordnerpfad – aber er zeigt auf einen
+        <strong>anderen Computer</strong>.
+      </p>
+      <table class="vergleich">
+        <tr><th></th><th>Ordnerpfad auf deinem PC</th><th>Pfad in einer URL</th></tr>
+        <tr><td><strong>Beispiel</strong></td><td><code>C:\Schule\radio\index.html</code></td><td><code>/archiv/2026.html</code></td></tr>
+        <tr><td><strong>Trennzeichen</strong></td><td><code>\</code> (Backslash)</td><td><code>/</code> (Schrägstrich)</td></tr>
+        <tr><td><strong>Wo liegt die Datei?</strong></td><td>auf deinem eigenen PC</td><td>auf dem Webserver im Internet</td></tr>
+        <tr><td><strong>Was steht am Anfang?</strong></td><td>das Laufwerk, z. B. <code>C:</code></td><td>die Domain, die den Server benennt</td></tr>
+      </table>
+      <div class="merk">
+        Die <strong>Domain</strong> sagt, <em>welcher Server</em> gemeint ist.
+        Der <strong>Pfad</strong> sagt, <em>welche Datei</em> auf diesem Server liegt.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Quiz: Gültige URL?</h2>
+      <p>Entscheide bei jeder Adresse: Ist es eine <strong>vollständige URL</strong> mit Protokoll?</p>
+
+      <div class="quiz-list" id="urlQuiz"></div>
+      <p id="urlScore" style="text-align:center;font-weight:700;color:var(--primary-dark)"></p>
+    </div>
+
+    <div class="card">
+      <h2>🔍 Zusatz: Tracking-Parameter</h2>
+      <p>Diese beiden Adressen führen zur <strong>gleichen Seite</strong>:</p>
+      <div class="track-wrap">
+        <div class="track-url">https://www.schulradio.de/archiv</div>
+        <div class="track-url">https://www.schulradio.de/archiv<span class="param">?utm_source=flyer&amp;utm_medium=print&amp;fbclid=xyz123</span></div>
+      </div>
+      <p>
+        Alles nach dem <code class="inline">?</code> sind <strong>Parameter</strong>
+        (<code class="inline">name=wert</code>, mehrere durch
+        <code class="inline">&amp;</code> getrennt). Parameter können den Inhalt einer
+        Seite durchaus beeinflussen – zum Beispiel bei einer Suche oder einer gewählten
+        Sprache. <em>In diesem Beispiel</em> ändern sie die Seite aber nicht: Sie verraten
+        nur, <em>über welchen Flyer</em> jemand gekommen ist. Das nennt man
+        <strong>Tracking</strong>.
+      </p>
+      <p><strong>Was meinst du?</strong> Welche der beiden Adressen würdest du an eine Freundin weitergeben?</p>
+      <div class="btn-row">
+        <button class="action btn-next" data-share="clean" style="display:inline-block">URL ohne Parameter</button>
+        <button class="action btn-next" data-share="track" style="display:inline-block">URL mit Parametern</button>
+      </div>
+      <div class="feedback" id="trackFeedback"></div>
+    </div>
+
+  </section>
+
   <!-- ================= Seite 2: DNS ================= -->
   <section class="page" id="page-dns">
 
@@ -564,6 +837,27 @@
       </div>
 
       <div class="feedback" id="dnsFeedback"></div>
+    </div>
+
+    <div class="card">
+      <h2>💻 Selbst ausprobieren: IP-Adresse zu einer Domain finden (Windows)</h2>
+      <p>Windows kann einen DNS-Server direkt fragen. So findest du heraus, welche IP-Adresse zu einer Domain gehört:</p>
+      <ol class="schritt">
+        <li>Drücke die <strong>Windows-Taste</strong>, tippe <code class="inline">PowerShell</code> ein und öffne die App.</li>
+        <li>Gib folgenden Befehl ein und drücke die <strong>Eingabetaste</strong>:</li>
+      </ol>
+      <div class="code-example">Resolve-DnsName www.bundestag.de -Type A</div>
+      <p>
+        In der Ausgabe findest du eine Zeile mit <code class="inline">IPAddress</code> – dort steht die
+        IPv4-Adresse des Webservers. Ersetze <code class="inline">www.bundestag.de</code> im Befehl
+        durch eine andere Domain, um deren Adresse zu finden.
+      </p>
+      <div class="merk">
+        Mit dem Zusatz <code class="inline">-Type A</code> bekommst du nur die IP-Adressen, die wir bisher kennengelernt haben. Es gibt aber auch noch IP-Adressen, die anders aufgebaut sind.
+        Ohne <code class="inline">-Type A</code> zeigt Windows auch IPv6-Adressen (Typ
+        <code class="inline">AAAA</code>) an. Mit <code class="inline">-Type A</code> bekommst du
+        nur die IPv4-Adressen.
+      </div>
     </div>
 
   </section>
@@ -632,7 +926,7 @@
     <div class="card">
       <h2>💾 Weiter experimentieren: Deine eigene Webseite auf dem PC</h2>
       <p>
-        Jetzt wird es spannend: Du erstellst eine <strong>echte Webseite als Datei</strong>
+        Du erstellst nun eine <strong>echte Webseite als Datei</strong>
         auf deinem eigenen Computer. Dafür brauchst du <strong>zwei Dateien im selben Ordner</strong>:
         eine HTML-Datei (der Inhalt) und eine CSS-Datei (das Aussehen).
       </p>
@@ -1067,6 +1361,143 @@ footer {
         try { document.execCommand("copy"); done(); } catch (e) {}
         document.body.removeChild(ta);
       }
+    });
+  });
+
+  /* ---------- URLs: Aufbau zuordnen ---------- */
+  var urlStuecke = document.querySelectorAll(".url-stueck");
+  var urlCheck = document.getElementById("urlCheck");
+  var urlReset = document.getElementById("urlReset");
+  var urlFeedback = document.getElementById("urlFeedback");
+
+  urlCheck.addEventListener("click", function () {
+    var alleRichtig = true;
+    var gewaehlt = 0;
+    urlStuecke.forEach(function (stueck) {
+      var sel = stueck.querySelector("select");
+      stueck.classList.remove("ok", "nope");
+      if (!sel.value) { alleRichtig = false; return; }
+      gewaehlt++;
+      if (sel.value === stueck.dataset.part) stueck.classList.add("ok");
+      else { stueck.classList.add("nope"); alleRichtig = false; }
+    });
+    urlFeedback.className = "feedback show " + (alleRichtig ? "good" : "bad");
+    if (alleRichtig) {
+      urlFeedback.innerHTML = "<strong>🎉 Super!</strong> Alle fünf Teile stimmen: " +
+        "<em>https://</em> ist das Protokoll, <em>musik</em> die Subdomain, " +
+        "<em>schulradio</em> der Domainname, <em>.de</em> die TLD und " +
+        "<em>/archiv/2026.html</em> der Pfad.";
+    } else if (gewaehlt < urlStuecke.length) {
+      urlFeedback.innerHTML = "<strong>Fast!</strong> Bitte ordne zuerst allen fünf Teilen einen Begriff zu.";
+    } else {
+      urlFeedback.innerHTML = "<strong>Noch nicht ganz.</strong> Schau dir die rot markierten Teile nochmal an. Tipp: Der letzte Teil nach dem Punkt ist die TLD.";
+    }
+  });
+
+  urlReset.addEventListener("click", function () {
+    urlStuecke.forEach(function (stueck) {
+      stueck.querySelector("select").value = "";
+      stueck.classList.remove("ok", "nope");
+    });
+    urlFeedback.className = "feedback";
+    urlFeedback.textContent = "";
+  });
+
+  /* ---------- URLs: Subdomain ---------- */
+  var subInput = document.getElementById("subInput");
+  var subCheck = document.getElementById("subCheck");
+  var subFeedback = document.getElementById("subFeedback");
+
+  function subdomainPruefen() {
+    var antwort = subInput.value.trim().toLowerCase()
+      .replace(/\s+/g, "").replace(/\/$/, "");
+    var richtig = antwort === "sport" || antwort === "sport.schulradio.de" ||
+      antwort === "www.sport.schulradio.de";
+    subFeedback.className = "feedback show " + (richtig ? "good" : "bad");
+    subFeedback.innerHTML = richtig
+      ? "<strong>✅ Richtig!</strong> <code>sport.schulradio.de</code> – <em>sport</em> ist die Subdomain, <em>schulradio.de</em> ist die Domain."
+      : "<strong>Fast!</strong> Die Subdomain steht <em>vor</em> der Domain. Setze also <em>sport</em> vor <em>schulradio.de</em>.";
+  }
+
+  subCheck.addEventListener("click", subdomainPruefen);
+  subInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") subdomainPruefen();
+  });
+
+  /* ---------- URLs: Quiz ---------- */
+  var urlQuizData = [
+    { url: "https://www.bundestag.de", valid: true,
+      why: "Protokoll, Domain und TLD sind vorhanden." },
+    { url: "www.bundestag.de", valid: false,
+      why: "Das Protokoll fehlt. Der Browser ergänzt es oft selbst – eine vollständige URL ist das aber nicht." },
+    { url: "https://musik.schulradio.de/archiv", valid: true,
+      why: "Subdomain, Domain, TLD und Pfad sind vorhanden." },
+    { url: "https://www.schulradio", valid: false,
+      why: "Die TLD fehlt – nach dem Domainnamen muss noch ein Teil wie .de stehen." },
+    { url: "htps://www.schulradio.de", valid: false,
+      why: "Das Protokoll ist falsch geschrieben. Richtig wäre https://." },
+    { url: "https://www.schulradio.de/bilder/logo.png", valid: true,
+      why: "Vollständige URL mit Pfad zu einer Bilddatei." },
+    { url: "C:\\Schule\\radio\\index.html", valid: false,
+      why: "Das ist ein Ordnerpfad auf einem PC, keine URL im Internet." },
+    { url: "https://www.schulradio.de/", valid: true,
+      why: "Vollständige URL der Startseite." }
+  ];
+
+  var urlQuiz = document.getElementById("urlQuiz");
+  var urlScore = document.getElementById("urlScore");
+  var quizDone = 0;
+  var quizRight = 0;
+
+  urlQuizData.forEach(function (item) {
+    var row = document.createElement("div");
+    row.className = "quiz-item";
+
+    var text = document.createElement("span");
+    var code = document.createElement("code");
+    code.textContent = item.url;
+    text.appendChild(code);
+
+    var btnJa = document.createElement("button");
+    btnJa.className = "waehl";
+    btnJa.textContent = "✅ Gültig";
+    var btnNein = document.createElement("button");
+    btnNein.className = "waehl";
+    btnNein.textContent = "❌ Ungültig";
+
+    var hinweis = document.createElement("div");
+    hinweis.className = "hinweis";
+
+    function antworten(sagtGueltig) {
+      btnJa.disabled = true;
+      btnNein.disabled = true;
+      var ok = (sagtGueltig === item.valid);
+      row.classList.add("beantwortet", ok ? "correct" : "wrong");
+      hinweis.innerHTML = (ok ? "<strong>Richtig.</strong> " : "<strong>Nicht ganz.</strong> ") + item.why;
+      if (!row.dataset.done) {
+        row.dataset.done = "1";
+        quizDone++;
+        if (ok) quizRight++;
+        urlScore.textContent = quizRight + " von " + quizDone + " richtig beantwortet";
+      }
+    }
+
+    btnJa.addEventListener("click", function () { antworten(true); });
+    btnNein.addEventListener("click", function () { antworten(false); });
+
+    row.append(text, btnJa, btnNein, hinweis);
+    urlQuiz.appendChild(row);
+  });
+
+  /* ---------- URLs: Tracking-Parameter ---------- */
+  var trackFeedback = document.getElementById("trackFeedback");
+  document.querySelectorAll("[data-share]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var sauber = btn.dataset.share === "clean";
+      trackFeedback.className = "feedback show " + (sauber ? "good" : "bad");
+      trackFeedback.innerHTML = sauber
+        ? "<strong>✅ Gute Wahl!</strong> In diesem Beispiel sind die Parameter nach dem <code>?</code> nur Zusatzinformationen. Ohne sie lädt die Seite genauso – und du verrätst nicht, woher der Link stammt."
+        : "<strong>Hm.</strong> In diesem Beispiel würde sich die Seite zwar genauso öffnen, aber du gibst die Tracking-Parameter weiter. Ohne den Teil ab <code>?</code> bleibt der Link sauber.";
     });
   });
 
